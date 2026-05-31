@@ -430,6 +430,10 @@ The OT corpus already exists (27 tracks, 545 files, L1–L5, the two-pass Claude
 
 ## 15. Build roadmap (phased, human-gated)
 
+> **Progress is tracked in [`.factory/STATE.md`](./.factory/STATE.md) — read that to resume.** As of
+> 2026-05-31: **P0 ✅ · v0.1 ✅ · v0.5 ✅ · v0.8 ✅** (live night-shift PR #1 + Codex/Gemini review green);
+> **v0.9 is next.** STATE.md has the acceptance evidence, the deployment fixes baked into the templates, and open items.
+
 Every first-class component (the 7 workflows §9, 12 agents §8, 4 repos §6, the config contract §5, the autonomy/budget plumbing §8/§10) is scheduled into exactly one phase below. Phases are cumulative; each ends at a human-verified acceptance gate. The layer model is built **bottom-up** (L1→L2→L3 in v0.1, **L4+L5 in v0.5**, PM in v0.9, **L6 in v1.0**) so the corpus is always usable at its current ceiling.
 
 | Phase | Deliverables | Acceptance gate |
@@ -550,6 +554,7 @@ The machine drafted and reviewed everything; you made ~4 judgment calls.
 ## 18. Bootstrap instructions for a fresh agent
 
 If you are an agent picking this up cold:
+0. **First read [`.factory/STATE.md`](./.factory/STATE.md)** — current phase, what's done, the deployment fixes already baked in, open items, and how to resume. Do not re-do completed phases.
 1. Read this file fully, then read the three reference factories for concrete patterns: `vsdd-factory/plugins/vsdd-factory/docs/FACTORY.md` (orchestration/state/gates), `secops-factory/plugins/secops-factory/` (the minimal shipped skeleton — copy its manifest/hook/agent/skill shapes), `brain-factory/docs/planning/llm-second-brain-plugin-plan.md` (the full skeleton incl. cron Actions + `run-skill.mjs` + engine/target split). brain-factory is the closest analog.
 2. Read the OT instance's process docs (in `ot-security-research/`): `CLAUDE.md`, `_meta/ot-corpus-layer-model.md`, `_meta/ot-security-codex-review-process.md`, `_meta/ot-build-and-curate-playbook.md`, `_meta/reconstructed/research-standards.md`. These ARE the v0.1 editorial profile + review spec.
 3. Read `pm-process/` for the downstream pipeline: `practice-operating-model.md`, `pm-docs-gpt-prompt.md`, and the `examples/ot-operationalization-assessment/` chain.
