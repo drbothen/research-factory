@@ -29,10 +29,11 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}   # use workflow token — avoids needing the Claude GitHub App
           # Enable the engine plugin natively (verified input keys). If drbothen/research-factory
           # is PRIVATE, the runner needs cross-repo read (a PAT secret); if public, this works as-is.
           plugin_marketplaces: |
-            https://github.com/drbothen/research-factory
+            https://github.com/drbothen/research-factory.git
           plugins: |
             research-factory@research-factory
           claude_args: "--model claude-sonnet-4-6"
