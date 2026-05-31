@@ -431,8 +431,9 @@ The OT corpus already exists (27 tracks, 545 files, L1–L5, the two-pass Claude
 ## 15. Build roadmap (phased, human-gated)
 
 > **Progress is tracked in [`.factory/STATE.md`](./.factory/STATE.md) — read that to resume.** As of
-> 2026-05-31: **P0 ✅ · v0.1 ✅ · v0.5 ✅ · v0.8 ✅** (live night-shift PR #1 + Codex/Gemini review green);
-> **v0.9 is next.** STATE.md has the acceptance evidence, the deployment fixes baked into the templates, and open items.
+> 2026-05-31: **P0 ✅ · v0.1 ✅ · v0.5 ✅ · v0.8 ✅** (live night-shift PR #1 + Codex/Gemini review green) ·
+> **v0.9 🟡 components built** (PM pipeline; acceptance run pending). STATE.md has the acceptance evidence,
+> the deployment fixes baked into the templates, and open items.
 
 Every first-class component (the 7 workflows §9, 12 agents §8, 4 repos §6, the config contract §5, the autonomy/budget plumbing §8/§10) is scheduled into exactly one phase below. Phases are cumulative; each ends at a human-verified acceptance gate. The layer model is built **bottom-up** (L1→L2→L3 in v0.1, **L4+L5 in v0.5**, PM in v0.9, **L6 in v1.0**) so the corpus is always usable at its current ceiling.
 

@@ -3,6 +3,16 @@
 Build progress is tracked authoritatively in [`.factory/STATE.md`](./.factory/STATE.md).
 This file records what each phase delivered.
 
+## 0.9.0 — PM pipeline (2026-05-31)
+
+- `pm-doc-writer` agent (from pm-process/pm-docs-gpt-prompt.md): principal-PM voice, MVF-vs-Future,
+  never-invent → labeled Assumptions + Open Questions.
+- `pm-doc-chain.lobster`: intake → concept → [worth-pursuing gate] → 6-pager → PRD → [Dev-Readiness Check
+  gate, 7 failure modes] → user-stories → acceptance-plan → human-approval → commit. Each judgment point human-gated.
+- `templates/pm/`: concept-narrative, six-pager, 7-section PRD, 7-field user-stories, acceptance-plan
+  (derived from the spec + the OPRA worked example).
+- Command shim `/pm-doc-chain`. Components built; acceptance RUN (OT finding → dev-ready PRD) pending.
+
 ## 0.8.0 — Actions autonomy + market instantiation (2026-05-31)
 
 - 4 per-instance GitHub Action templates wiring the 3 vendor CLIs: `ingest`, `nightly-research`,

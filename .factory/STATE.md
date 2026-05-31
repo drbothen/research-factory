@@ -7,8 +7,10 @@ Last updated: 2026-05-31.
 
 ## Current phase
 
-**v0.8 COMPLETE.** Next: **v0.9 — PM pipeline** (pm-doc-chain + pm-doc-writer + pm-process templates:
-concept → 6-pager → PRD → user-stories → acceptance-plan).
+**v0.9 COMPONENTS BUILT** (pm-doc-writer agent, pm-doc-chain.lobster + Dev-Readiness gate, 5 pm/ templates,
+command shim; manifests 0.9.0; 6 workflows validate, 34 bats green). **Next: the v0.9 acceptance RUN** —
+a selected OT L4/L5 finding through pm-doc-chain → dev-ready PRD + stories passing the Dev-Readiness Check
+(by-hand, like the v0.5 run). Then v1.0.
 
 ## Roadmap status (BUILD-PLAN §15)
 
@@ -18,7 +20,7 @@ concept → 6-pager → PRD → user-stories → acceptance-plan).
 | v0.1 — engine skeleton + OT instance | ✅ done | require-citation hook proven headless; build-track → adversary PASS on one track; config loader |
 | v0.5 — L1→L5 pipeline | ✅ done | L3→L4 synth → adversary PASS; L5 judgment through human gate (REVISE×3→PASS); 34 bats green |
 | v0.8 — Actions autonomy + /init-market | ✅ done | live night-shift run → **PR #1** (real fixes, autonomy 3); Codex+Gemini review green; /init-market throwaway scaffold |
-| v0.9 — PM pipeline | ⬜ next | a selected finding → dev-ready PRD + stories passing the readiness check |
+| v0.9 — PM pipeline | 🟡 components built | a selected finding → dev-ready PRD + stories passing the readiness check (acceptance RUN pending) |
 | v1.0 — portfolio (L6) + 2nd market + marketplace publish | ⬜ | 2nd market to Beta from cold seed; L6 brief; engine version-bump propagation |
 
 ## Repos
