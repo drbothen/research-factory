@@ -53,7 +53,8 @@ jobs:
           GEMINI_CLI_TRUST_WORKSPACE: "true"
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}   # verified input key (snake_case)
-          gemini_model: gemini-3-pro                       # confirm exact ID at build
+          # gemini_model left UNSET → the CLI picks a current valid default. ("gemini-3-pro" was
+          # NOT a valid generateContent model ID on the API — pin a verified ID here only if needed.)
           # Checks: does each cited source SUPPORT the claim? (P3) — a URL is not enough.
           prompt: |
             You are the citation-verifier. For each cited claim in this PR diff, verify the
