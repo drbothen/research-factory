@@ -33,6 +33,10 @@ jobs:
           model: gpt-5.5                       # default adversary model (verified 2026-05-31)
           sandbox: read-only                   # adversary never writes the corpus
           safety-strategy: read-only
+          # The night-shift PR is authored by the App (claude[bot]); allow our own bot past the
+          # actor write-access guard so it can review bot-authored PRs (it sees claude[bot] as 'none').
+          allow-bots: true
+          allow-bot-users: "claude[bot]"
           prompt-file: docs/review-spec.md     # the 6-dimension spec (vendor-neutral)
           # Codex reviews the PR diff and posts findings as review comments.
 
@@ -44,6 +48,9 @@ jobs:
         with: { fetch-depth: 0 }
       - name: Gemini source-faithfulness pass (third independent family)
         uses: google-github-actions/run-gemini-cli@v0
+        env:
+          # gemini-cli refuses untrusted workspaces in headless mode; trust the checkout explicitly.
+          GEMINI_CLI_TRUST_WORKSPACE: "true"
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}   # verified input key (snake_case)
           gemini_model: gemini-3-pro                       # confirm exact ID at build
