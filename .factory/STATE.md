@@ -52,6 +52,15 @@ The v0.8 live shakedown surfaced these; all corrected in `templates/github-actio
 Audit: every builder run uploads the `claude-execution-log` artifact (`execution_file`). `show_full_output`
 stays OFF (it echoes tool results incl. secrets into the log).
 
+## Deferred components (built lean vs BUILD-PLAN §7–§12; see §15.1 for the full delta)
+
+- **Hooks 4/9** (have: require-citation, layer-discipline, protect-secrets, forbidden-phrase). Deferred (state-dependent, in `docs/HOOKS.md`): source-faithfulness-guard, anchor-not-strip-guard, convergence-tracker, protect-canonical, factory-branch-guard.
+- **Agents 11/12** — missing `github-ops`; no `orchestrator/*-sequence` playbooks.
+- **Workflows 6/7** — missing `portfolio-synth` (v1.0/L6).
+- **Templates** — no `templates/corpus/` generic doc templates for new markets.
+- **Docs/dirs** — missing `docs/FACTORY.md`, `CONVERGENCE.md`; unused `data/`, `checklists/`; no engine `LICENSE` / `CLAUDE.md`.
+- **State model** — `.factory/` on `main`, not the orphan `factory-artifacts` worktree (§11); no INDEX sharding / size-cap hook.
+
 ## Open items (not blockers)
 
 - **build-track iteration cap (v0.9 refinement):** the adversary loop has no cap → runs away (50+ min, no

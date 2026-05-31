@@ -446,6 +446,26 @@ Every first-class component (the 7 workflows §9, 12 agents §8, 4 repos §6, th
 | **v0.9 — PM pipeline** | `pm-doc-chain.lobster` + `pm-doc-writer` agent + the pm-process templates (concept→6-pager→PRD→stories→acceptance) + the Dev-Readiness-Check gate. | A selected OT finding produces a dev-ready PRD + stories passing the readiness check. |
 | **v1.0 — Portfolio (L6) + 2nd market + engine release** | `research-portfolio` repo + `portfolio-synth` (L6); stand up a **real second market** cold via `/init-market` (proves the dynamic requirement); **engine marketplace publish + `bump-engine` cross-instance version-propagation Action** (§6); port hooks to the shared WASM `factory-dispatcher`; consider autonomy 3.5 for research-layer merges. | Second market reaches Beta from a cold seed; an L6 cross-market brief is human-approved; an engine version bump propagates to both instances via PR. |
 
+### 15.1 Build status & delta (as of 2026-05-31)
+
+**Phases: P0 ✅ · v0.1 ✅ · v0.5 ✅ · v0.8 ✅ · v0.9 ✅ · v1.0 ⬜.** Live proof: instance **PR #1** (night-shift
+`build-track` → adversary PASS → human-merged, autonomy 3). Three repos shipped: `drbothen/research-factory`,
+`drbothen/research-factory-template`, `1898andCo/ot-ics-research`. Live status: [`.factory/STATE.md`](./.factory/STATE.md).
+
+**Specified in §7–§12 but deferred** (built lean; none blocked the acceptance gates that passed):
+- **Hooks — 4 of 9 implemented** (require-citation, layer-discipline, protect-secrets, forbidden-phrase; live + tested).
+  Deferred, state-dependent, documented in `docs/HOOKS.md`: `source-faithfulness-guard`, `anchor-not-strip-guard`,
+  `convergence-tracker`, `protect-canonical`, `factory-branch-guard`.
+- **Agents — 11 of 12** (missing `github-ops`; `orchestrator` is a single agent, no `orchestrator/*-sequence` playbooks).
+- **Workflows — 6 of 7** (missing `portfolio-synth.lobster` — it is v1.0/L6).
+- **Templates:** `templates/corpus/` (generic L2/L3/summary/L4 doc templates for *new* markets) not shipped — the OT instance uses its migrated patterns.
+- **Docs/dirs:** have FACTORY-SOUL · LAYER-MODEL · AUTONOMY · HOOKS; missing `docs/FACTORY.md` (engine orientation) + `CONVERGENCE.md`; `data/` and `checklists/` unused (the review spec lives in the instance as `docs/review-spec.md`); engine `LICENSE` + `CLAUDE.md` not added.
+- **State model (§11):** `.factory/STATE.md` committed to `main` (works) rather than the orphan `factory-artifacts` branch worktree; no INDEX+detail sharding or STATE.md size-cap hook yet.
+
+**Behavioral open items (surfaced by acceptance runs):**
+- `build-track`'s adversary loop has **no iteration cap** → runs away (50+ min, never converges) on a heavily-flawed doc → never commits. Needs a max-N-passes cap → commit-what-it-has + PR flagged "did not fully converge, M MUST-FIX remain."
+- `on-pr-review` reviewers run green but post **0 comments** on bot PRs — verify posting against a deliberately-flawed PR (likely fine, since build-track PRs arrive already converged).
+
 ---
 
 ## 16. Operating the factory — day-in-the-life
