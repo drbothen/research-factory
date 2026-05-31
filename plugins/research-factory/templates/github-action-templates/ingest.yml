@@ -23,6 +23,10 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          plugin_marketplaces: |
+            https://github.com/drbothen/research-factory
+          plugins: |
+            research-factory@research-factory
           claude_args: "--model claude-sonnet-4-6"
           prompt: |
             New source(s) landed in seed/inbox/. Run the research-factory ingest-source workflow:

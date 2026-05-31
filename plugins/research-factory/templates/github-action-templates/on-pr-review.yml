@@ -31,7 +31,8 @@ jobs:
         with:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
           model: gpt-5.5                       # default adversary model (verified 2026-05-31)
-          # safety-strategy: drop-sudo · sandbox: read-only — adversary never writes the corpus
+          sandbox: read-only                   # adversary never writes the corpus
+          safety-strategy: read-only
           prompt-file: docs/review-spec.md     # the 6-dimension spec (vendor-neutral)
           # Codex reviews the PR diff and posts findings as review comments.
 
@@ -43,11 +44,10 @@ jobs:
         with: { fetch-depth: 0 }
       - name: Gemini source-faithfulness pass (third independent family)
         uses: google-github-actions/run-gemini-cli@v0
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         with:
-          # gemini-3-pro (confirm exact ID at build). Checks: does each cited source SUPPORT
-          # the claim? (P3) — presence of a URL is not enough.
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}   # verified input key (snake_case)
+          gemini_model: gemini-3-pro                       # confirm exact ID at build
+          # Checks: does each cited source SUPPORT the claim? (P3) — a URL is not enough.
           prompt: |
             You are the citation-verifier. For each cited claim in this PR diff, verify the
             cited source actually supports the claim (NLI-style): SUPPORTED / PARTIAL /

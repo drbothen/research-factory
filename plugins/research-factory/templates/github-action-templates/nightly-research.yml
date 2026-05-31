@@ -28,9 +28,12 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          # The engine plugin must be ENABLED here (marketplace install / .claude/settings.json),
-          # not merely present (BUILD-PLAN §8 ⚠). The instance's .claude/settings.json enables
-          # research-factory@research-factory.
+          # Enable the engine plugin natively (verified input keys). If drbothen/research-factory
+          # is PRIVATE, the runner needs cross-repo read (a PAT secret); if public, this works as-is.
+          plugin_marketplaces: |
+            https://github.com/drbothen/research-factory
+          plugins: |
+            research-factory@research-factory
           claude_args: "--model claude-sonnet-4-6"
           prompt: |
             Run the research-factory build-track skill on ${{ github.event.inputs.track || 'the next open work-item in WORK-BACKLOG / STATE.md' }}.
