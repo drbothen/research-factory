@@ -21,6 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Claude builder — ingest the new source (L1/L2)
+        id: claude
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -35,3 +36,22 @@ jobs:
             capture → quarantine-fetch → draft the L1/L2 observation with a citation on every
             claim (or an explicit [Source needed]/[Access required] flag) → editorial-sweep →
             citation-verify → adversary loop to PASS → state-manager. Open a PR. DO NOT merge.
+
+      # --- audit: persist the full Claude conversation/execution log ---
+      - name: Upload Claude execution log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: claude-execution-log-${{ github.run_id }}
+          path: ${{ steps.claude.outputs.execution_file }}
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Summarize what Claude did
+        if: always()
+        run: |
+          {
+            echo "### Ingest run summary"
+            echo "- session_id: \`${{ steps.claude.outputs.session_id }}\`"
+            echo "- branch_name: \`${{ steps.claude.outputs.branch_name }}\`  ← empty = no commit"
+            echo "- full conversation log: artifact \`claude-execution-log-${{ github.run_id }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -26,6 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Claude builder — run build-track on the next work-item
+        id: claude
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -42,3 +43,22 @@ jobs:
             Draft/advance → editorial-sweep → citation-verify → adversary loop to PASS → state-manager.
             Open a PR with the result. DO NOT merge. Surface anything needing human judgment.
           # show_full_output: false  (output is public on public repos, §12.2)
+
+      # --- audit: persist the full Claude conversation/execution log (not a black box) ---
+      - name: Upload Claude execution log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: claude-execution-log-${{ github.run_id }}
+          path: ${{ steps.claude.outputs.execution_file }}
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Summarize what the night shift did
+        if: always()
+        run: |
+          {
+            echo "### Night-shift run summary"
+            echo "- session_id: \`${{ steps.claude.outputs.session_id }}\`"
+            echo "- branch_name: \`${{ steps.claude.outputs.branch_name }}\`  ← empty = Claude made no commit"
+            echo "- full conversation log: artifact \`claude-execution-log-${{ github.run_id }}\` (resume with --resume <session_id>)"
+          } >> "$GITHUB_STEP_SUMMARY"
