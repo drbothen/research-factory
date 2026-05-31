@@ -34,11 +34,11 @@ jobs:
           TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          # With the Claude GitHub App now installed, the App token (default OIDC path) has the
-          # push/PR permissions; github_token also works. Keeping github_token for determinism.
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          # Enable the engine plugin natively (verified input keys). If drbothen/research-factory
-          # is PRIVATE, the runner needs cross-repo read (a PAT secret); if public, this works as-is.
+          # NO github_token override → the action uses the Claude GitHub App token, which has
+          # workflows:write (verified on the 1898andCo install) and CAN push branches whose range
+          # touches .github/workflows/. GITHUB_TOKEN cannot — that was the blocked-push root cause.
+          # The App token also triggers on-pr-review when Claude opens the PR (GITHUB_TOKEN would not).
+          # Enable the engine plugin natively (verified input keys); engine repo is public.
           plugin_marketplaces: |
             https://github.com/drbothen/research-factory.git
           plugins: |
@@ -52,8 +52,10 @@ jobs:
             Run the research-factory build-track skill on ${{ github.event.inputs.track || 'the next open work-item in WORK-BACKLOG / STATE.md' }}.
             Draft/advance → editorial-sweep → citation-verify → adversary loop to PASS → state-manager.
             When the loop reaches an adversary PASS, COMMIT the changes to a new branch named
-            claude/<track>-<short-desc> and push it (the state-manager step). Do NOT merge.
-            If you make no changes, say so explicitly. Surface anything needing human judgment.
+            claude/<track>-<short-desc>, push it, then OPEN A PR with:
+              gh pr create --base main --head <that-branch> --title "Night shift: <track>" --body "<short summary + 'Human merges (autonomy 3)'>"
+            Do NOT merge. If you make NO changes, say so explicitly and open no PR/branch.
+            Surface anything needing human judgment.
           # show_full_output left OFF — it can echo tool results (incl. secrets) into the run log.
           # The full conversation is captured the safe way: the claude-execution-log artifact below.
 
@@ -72,18 +74,30 @@ jobs:
           {
             echo "### Night-shift run summary"
             echo "- session_id: \`${{ steps.claude.outputs.session_id }}\`"
-            echo "- branch_name: \`${{ steps.claude.outputs.branch_name }}\`  ← empty = Claude made no commit"
+            echo "- (note: claude-code-action branch_name is empty when Claude pushes via Bash — see the detected branch below)"
             echo "- full conversation log: artifact \`claude-execution-log-${{ github.run_id }}\` (resume with --resume <session_id>)"
           } >> "$GITHUB_STEP_SUMMARY"
 
-      # claude-code-action only PUSHES a branch; it does not open a PR. Do that here (autonomy 3 = PR, never merge).
-      - name: Open a PR for Claude's branch
-        if: ${{ steps.claude.outputs.branch_name != '' }}
+      # Fallback PR opener. Claude opens the PR itself via the App token (which triggers on-pr-review).
+      # This step is a safety net: detect the branch Claude pushed (branch_name output is empty for
+      # manual Bash pushes) and ensure a PR exists. It runs even if Claude's own gh pr create didn't.
+      - name: Ensure a PR exists for Claude's branch
+        if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr create --repo "${{ github.repository }}" \
-            --head "${{ steps.claude.outputs.branch_name }}" --base main \
-            --title "Night shift: ${{ github.event.inputs.track || 'work-item' }}" \
-            --body "Automated build-track run (adversary PASS required before push). Human merges — autonomy 3. Conversation log: artifact claude-execution-log-${{ github.run_id }}." \
-            || echo "PR may already exist for ${{ steps.claude.outputs.branch_name }}"
+          TRACK="${{ github.event.inputs.track || '' }}"
+          BR=$(git ls-remote --heads origin "refs/heads/claude/${TRACK}*" | sed 's|.*refs/heads/||' | sort | tail -1)
+          if [ -z "$BR" ]; then
+            echo "No claude/${TRACK}* branch on remote — Claude made no committable change, or the push failed."
+            exit 0
+          fi
+          echo "Detected pushed branch: $BR"
+          if [ -n "$(gh pr list --repo "${{ github.repository }}" --head "$BR" --json number -q '.[0].number')" ]; then
+            echo "PR already open for $BR (Claude opened it via the App token)."
+            exit 0
+          fi
+          gh pr create --repo "${{ github.repository }}" --head "$BR" --base main \
+            --title "Night shift: ${TRACK:-work-item}" \
+            --body "Automated build-track run (adversary PASS). Human merges — autonomy 3. Conversation log: artifact claude-execution-log-${{ github.run_id }}." \
+            || echo "PR may already exist for $BR"

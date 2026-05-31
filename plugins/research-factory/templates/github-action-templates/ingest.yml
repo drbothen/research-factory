@@ -28,7 +28,6 @@ jobs:
           TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}   # workflow token (avoids needing the Claude GitHub App)
           plugin_marketplaces: |
             https://github.com/drbothen/research-factory.git
           plugins: |
