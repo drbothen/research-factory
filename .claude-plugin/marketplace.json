@@ -1,0 +1,25 @@
+{
+  "name": "research-factory",
+  "owner": {
+    "name": "drbothen"
+  },
+  "metadata": {
+    "description": "Research Factory marketplace — generic, dynamic sourced-corpus research engine for Claude Code."
+  },
+  "plugins": [
+    {
+      "name": "research-factory",
+      "version": "0.1.0",
+      "source": "./plugins/research-factory",
+      "description": "Autonomous, citation-faithful research-corpus engine: L1-L6 layer model, two-pass adversarial review, fail-closed citation gates. Domain-agnostic — a new market is config + seed, not code.",
+      "category": "research",
+      "tags": [
+        "research",
+        "corpus",
+        "citations",
+        "synthesis",
+        "ot-security"
+      ]
+    }
+  ]
+}

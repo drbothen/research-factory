@@ -1,0 +1,32 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install bats + jq
+        run: sudo apt-get update && sudo apt-get install -y bats jq
+
+      - name: Validate plugin JSON manifests
+        run: |
+          for f in .claude-plugin/marketplace.json plugins/research-factory/.claude-plugin/plugin.json plugins/research-factory/hooks/hooks.json; do
+            echo "validating $f"
+            jq -e . "$f" > /dev/null
+          done
+
+      - name: Assert hooks.json uses the wrapped {hooks:{event:[...]}} shape
+        run: |
+          jq -e '.hooks.PreToolUse[0].hooks[0].command | test("require-citation")' \
+            plugins/research-factory/hooks/hooks.json > /dev/null
+
+      - name: Run plugin test suite
+        run: bash plugins/research-factory/tests/run-all.sh

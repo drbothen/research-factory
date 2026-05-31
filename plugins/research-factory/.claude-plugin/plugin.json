@@ -1,0 +1,19 @@
+{
+  "name": "research-factory",
+  "description": "Generic research-corpus engine — L1-L6 layered observation, source-faithful citation verification, two-pass adversarial review with quantitative convergence, and a fail-closed citation gate. Builder runs on Claude Code; adversary/citation review run as cross-family CLI Actions.",
+  "version": "0.1.0",
+  "author": {
+    "name": "drbothen"
+  },
+  "homepage": "https://github.com/drbothen/research-factory",
+  "repository": "https://github.com/drbothen/research-factory",
+  "license": "MIT",
+  "keywords": [
+    "research",
+    "corpus",
+    "citations",
+    "synthesis",
+    "layer-model",
+    "adversarial-review"
+  ]
+}
