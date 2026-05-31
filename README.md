@@ -11,10 +11,10 @@ See [`BUILD-PLAN.md`](./BUILD-PLAN.md) for the full design (self-contained; read
 - [x] **P0** — secrets hygiene; 3 vendor keys provisioned + validated (hello-world Action green)
 - [x] **v0.1** — plugin skeleton; require-citation hook (proven headless); config loader; OT instance #1 (`1898andCo/ot-ics-research`) migrated + build-track loop validated (adversary PASS)
 - [x] **v0.5** — `.lobster` workflow engine (`bin/lobster-parse`) + 5 workflows; 6 more agents (orchestrator, synthesizer, judgment-writer, consistency-validator, editorial-sweeper, dashboard-builder); 4 fail-closed hooks (see `plugins/research-factory/docs/HOOKS.md`); `release.yml`
-- [ ] **v0.8** — GitHub Actions autonomy + `/init-market` + `research-factory-template`
+- [x] **v0.8** — per-instance Action templates wiring the 3 vendor CLIs (Claude builds · Codex+Gemini review); autonomy/budget plumbing (`docs/AUTONOMY.md`); `/init-market` skill; `research-factory-template` repo (`drbothen/research-factory-template`)
 - [ ] **v0.9** — PM pipeline · **v1.0** — portfolio (L6) + 2nd market + marketplace publish
 
-Test suite: 32 bats cases (config, hooks, lobster). CI validates manifests + all `.lobster` workflows + runs the suite.
+Test suite: 34 bats cases (config, hooks, lobster). CI validates manifests, all `.lobster` workflows, the Action templates, the template config, + runs the suite. v0.5 acceptance (L3→L4 + L5 judgment) passed on the OT instance.
 
 ## Cross-family model routing (verified 2026-05-31)
 

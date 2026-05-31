@@ -39,6 +39,32 @@ review:
     novelty_threshold: 0.15
     clean_passes_required: 3
 autonomy_level: 3                         # 3 = human gate on every merge (start here)
+                                          # 3.5 = auto-merge low-risk research PRs (0 markers,
+                                          #       adversary PASS, no editorial drift); human for
+                                          #       judgment/PM/publication
+                                          # 4   = full auto for research-layer; human still for L5/L6/PM/publish
+merge:
+  auto_merge_when:                        # only consulted at autonomy >= 3.5
+    - adversary_verdict: PASS
+    - must_fix_remaining: 0
+    - editorial_drift: none
+  always_human:                           # never auto, at any autonomy level
+    - l5_judgment
+    - l6_portfolio
+    - pm_productization
+    - publish_or_external_delivery
+
+# --- budget (cross-vendor; warn/alert/pause/hard-stop) ---
+budget:
+  currency: usd
+  per_run_cap: 25                         # pause a single run beyond this
+  thresholds:                             # cumulative spend tiers
+    warn: 100
+    alert: 250
+    pause: 400                            # pause new work; finish in-flight
+    hard_stop: 500                        # refuse new agent dispatch
+  vendors: [anthropic, openai, google]    # each key is a separate GitHub Secret
+  on_critical_path_downgrade: pause       # if budget forces a model downgrade, PAUSE not continue underpowered
 
 # --- deliverables this market produces ---
 deliverables:

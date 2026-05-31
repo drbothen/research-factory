@@ -1,0 +1,31 @@
+# ingest.yml — source intake (installed into an instance's .github/workflows/).
+# When a source URL/file is dropped in seed/inbox/, Claude drafts the L1/L2 observation with
+# citations via the ingest-source workflow and opens a PR. Cross-family review fires on PR open.
+#
+# ⚠ Build-time: confirm claude-code-action input keys + plugin-enable (BUILD-PLAN §8 ⚠).
+name: ingest
+on:
+  push:
+    paths: ["seed/inbox/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  ingest-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Claude builder — ingest the new source (L1/L2)
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: "--model claude-sonnet-4-6"
+          prompt: |
+            New source(s) landed in seed/inbox/. Run the research-factory ingest-source workflow:
+            capture → quarantine-fetch → draft the L1/L2 observation with a citation on every
+            claim (or an explicit [Source needed]/[Access required] flag) → editorial-sweep →
+            citation-verify → adversary loop to PASS → state-manager. Open a PR. DO NOT merge.

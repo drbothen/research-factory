@@ -1,0 +1,55 @@
+# on-pr-review.yml — cross-family review gate (installed into an instance's .github/workflows/).
+# When a PR opens, two DIFFERENT model families review the diff (P6 cognitive diversity):
+#   - OpenAI Codex   → the 6-dimension adversary review (prompt-file = docs/review-spec.md)
+#   - Gemini CLI     → the source-faithfulness / citation pass
+# Findings post as PR review comments. This is the GATE, not a merge — humans merge (autonomy 3).
+#
+# ⚠ Build-time: confirm each Action's input keys + current model IDs against vendor docs
+#   (BUILD-PLAN §8 ⚠). Tags are floating-major; model literals verified 2026-05-31.
+name: on-pr-review
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: pr-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  adversary-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30   # bounded unit — stay well under the 6h hosted cap (§12.2)
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Codex adversary review (different family than the Claude builder)
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          model: gpt-5.5                       # default adversary model (verified 2026-05-31)
+          # safety-strategy: drop-sudo · sandbox: read-only — adversary never writes the corpus
+          prompt-file: docs/review-spec.md     # the 6-dimension spec (vendor-neutral)
+          # Codex reviews the PR diff and posts findings as review comments.
+
+  citation-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Gemini source-faithfulness pass (third independent family)
+        uses: google-github-actions/run-gemini-cli@v0
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        with:
+          # gemini-3-pro (confirm exact ID at build). Checks: does each cited source SUPPORT
+          # the claim? (P3) — presence of a URL is not enough.
+          prompt: |
+            You are the citation-verifier. For each cited claim in this PR diff, verify the
+            cited source actually supports the claim (NLI-style): SUPPORTED / PARTIAL /
+            UNSUPPORTED / CONTRADICTED / UNREACHABLE. Post UNSUPPORTED/CONTRADICTED as
+            review comments (MUST-FIX). Do not guess an unreachable source.

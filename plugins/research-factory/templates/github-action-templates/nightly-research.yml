@@ -1,0 +1,39 @@
+# nightly-research.yml — the night shift (installed into an instance's .github/workflows/).
+# Claude Code (the builder) advances ONE open work-item/track through build-track and opens a
+# PR. It NEVER auto-merges at autonomy 3 — claude-code-action returns a branch + PR link, and a
+# human merges in the morning. Cross-family review fires via on-pr-review.yml when the PR opens.
+#
+# ⚠ Build-time: confirm claude-code-action input keys + plugin-enable in CI (BUILD-PLAN §8 ⚠).
+name: nightly-research
+on:
+  schedule:
+    - cron: "0 7 * * *"     # daily 07:00 UTC
+  workflow_dispatch:
+    inputs:
+      track:
+        description: "Track slug to advance (optional; default = next open work-item)"
+        required: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  advance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120     # bounded — one track/work-item, not the whole corpus (§12.2)
+    steps:
+      - uses: actions/checkout@v4
+      - name: Claude builder — run build-track on the next work-item
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # The engine plugin must be ENABLED here (marketplace install / .claude/settings.json),
+          # not merely present (BUILD-PLAN §8 ⚠). The instance's .claude/settings.json enables
+          # research-factory@research-factory.
+          claude_args: "--model claude-sonnet-4-6"
+          prompt: |
+            Run the research-factory build-track skill on ${{ github.event.inputs.track || 'the next open work-item in WORK-BACKLOG / STATE.md' }}.
+            Draft/advance → editorial-sweep → citation-verify → adversary loop to PASS → state-manager.
+            Open a PR with the result. DO NOT merge. Surface anything needing human judgment.
+          # show_full_output: false  (output is public on public repos, §12.2)
