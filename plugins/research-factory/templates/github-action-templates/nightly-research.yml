@@ -78,6 +78,28 @@ jobs:
             echo "- full conversation log: artifact \`claude-execution-log-${{ github.run_id }}\` (resume with --resume <session_id>)"
           } >> "$GITHUB_STEP_SUMMARY"
 
+      # Pipeline state (.factory/) lives on the orphan factory-artifacts branch, NOT in the corpus PR (§11).
+      # .factory/ is gitignored on main, so any state the run wrote is untracked here — persist it to its branch.
+      - name: Persist pipeline state to factory-artifacts
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          { [ -d .factory ] && [ -n "$(ls -A .factory 2>/dev/null)" ]; } || { echo "no .factory state written this run"; exit 0; }
+          git fetch origin factory-artifacts 2>/dev/null || true
+          wt="$(mktemp -d)"
+          if git show-ref --verify --quiet refs/remotes/origin/factory-artifacts; then
+            git worktree add -q "$wt" origin/factory-artifacts
+          else
+            git worktree add -q --orphan -b factory-artifacts "$wt"
+          fi
+          cp -R .factory/. "$wt"/
+          ( cd "$wt"
+            git add -A
+            git -c user.name="claude[bot]" -c user.email="claude[bot]@users.noreply.github.com" \
+              commit -m "state: night-shift ${{ github.event.inputs.track || 'work-item' }} (run ${{ github.run_id }})" \
+              && git push origin HEAD:factory-artifacts || echo "no state change to push" )
+
       # Fallback PR opener. Claude opens the PR itself via the App token (which triggers on-pr-review).
       # This step is a safety net: detect the branch Claude pushed (branch_name output is empty for
       # manual Bash pushes) and ensure a PR exists. It runs even if Claude's own gh pr create didn't.
