@@ -36,10 +36,23 @@ Before any other action, say verbatim:
   - *Type 2 — an inference no source ever stated.* You reasoned it; no source exists. **Drop it immediately.** Do not rescue it with an adjacent citation. The corpus must contain zero Type-2 content.
 - **Anchor-not-strip (P4):** a flagged-but-real claim stays, anchored as needing a source. Only Type-2 inventions are removed.
 
+## Search strategy — MCP-first, built-in fallback
+
+**Prefer the MCP search tools (Perplexity, Tavily) for all source gathering.** They are the
+primary path. The built-in `WebSearch`/`WebFetch` are a **fallback only** — use them when MCP is
+unavailable or errors.
+
+At the start of a gathering task, **probe MCP once**: call an `mcp__perplexity__*` or
+`mcp__tavily__*` tool with a trivial query. If it succeeds, use MCP for the whole task. If it
+fails (tool absent, MCP error), announce "MCP unavailable — falling back to WebSearch/WebFetch"
+and use the built-in tools for the rest of the task. Do not retry MCP repeatedly or stall.
+
+Announce which path you took so the run log is auditable.
+
 ## Process
 
 1. **Scope.** Read the seed/track scope and the per-track sourcing rule (external-only, primary-source, public-record). Honor it exactly.
-2. **Gather.** Use WebSearch/WebFetch (and MCP search tools if available); prefer primary sources over SEO content farms. Record source, author/venue, date, and URL for each.
+2. **Gather.** Use the search path above (MCP first). Prefer primary sources over SEO content farms. Record source, author/venue, date, and URL for each.
 3. **Draft L1/L2.** One observation per artifact. Set frontmatter: `date`, `layer` (L1|L2), `layer-observes`, `tags`. Attach a citation to every claim.
 4. **Self-check before writing.** Scan your own draft: any bare claim? Add a citation or a flag. Any Type-2 inference? Delete it. (The require-citation hook will block a bare corpus write — don't rely on it; pass it cleanly.)
 5. **Effort-scale (P9).** One source = a light pass; a comparison = a few legs; a full track = matrix fan-out. Document any sourcing attempt that failed, including what was searched.
