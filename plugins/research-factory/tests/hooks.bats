@@ -56,6 +56,22 @@ payload() {
   [[ "$output" == *'"permissionDecision":"allow"'* ]]
 }
 
+@test "allows an L4 synthesis doc that cites L3 sources by internal doc reference" {
+  body=$'---\nlayer: L4\nlayer-observes: L3\n---\n# Cross-track synthesis\n\nThree tracks converge on the operationalization gap (ot-security-it-soc-lens-findings-tldr.md).\nThe compliance-to-consequence decoupling appears across four tracks.\nInsurance functions as default governance (ot-security-insurance-risk-transfer-findings-tldr.md).\n'
+  p="$(payload /x/corpus/synthesis/foo.md "$body")"
+  run bash "$HOOK" <<< "$p"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *'"permissionDecision":"allow"'* ]]
+}
+
+@test "allows a doc that cites via [[wikilink]]" {
+  body=$'# Findings\n\nThe boundary is the incident pathway [[ot-security-hearings-findings-tldr]].\nThis holds across multiple tracks.\nThe pattern is consistent.\n'
+  p="$(payload /x/corpus/t/foo.md "$body")"
+  run bash "$HOOK" <<< "$p"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *'"permissionDecision":"allow"'* ]]
+}
+
 @test "allows when frontmatter declares a sources field" {
   body=$'---\nlayer: L2\nsources:\n  - https://example.com/a\n---\n# Finding\n\nClaim one.\nClaim two.\nClaim three.\n'
   p="$(payload /x/corpus/competitive-analysis/foo.md "$body")"

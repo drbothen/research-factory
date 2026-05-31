@@ -90,7 +90,13 @@ if [ "${CLAIM_LINES:-0}" -lt "$MIN_CLAIM_LINES" ]; then
 fi
 
 # --- look for a citation OR an explicit unsourced flag (case-insensitive) ---
-if printf '%s' "$CONTENT" | grep -qiE 'https?://|\[\^|\[source needed|\[citation needed|\[access required|\[unsourced|^[[:space:]]*(cites|source|sources):'; then
+# Accepted markers:
+#   external  : https?://  · footnote [^…]
+#   internal  : [[wikilink]] · a corpus doc reference (…​.md) — synthesis layers (L3/L4/L5)
+#               cite DOWNWARD by named lower-layer doc, not by external URL
+#   flags     : [Source needed] · [Citation needed] · [Access required] · [unsourced]
+#   frontmatter: cites:/source:/sources:
+if printf '%s' "$CONTENT" | grep -qiE 'https?://|\[\^|\[\[|[a-z0-9_-]+\.md|\[source needed|\[citation needed|\[access required|\[unsourced|^[[:space:]]*(cites|source|sources):'; then
   emit_allow
 fi
 
