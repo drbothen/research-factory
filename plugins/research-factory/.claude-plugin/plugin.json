@@ -1,7 +1,7 @@
 {
   "name": "research-factory",
   "description": "Generic research-corpus engine — L1-L6 layered observation, source-faithful citation verification, two-pass adversarial review with quantitative convergence, and a fail-closed citation gate. Builder runs on Claude Code; adversary/citation review run as cross-family CLI Actions.",
-  "version": "0.1.0",
+  "version": "0.5.0",
   "author": {
     "name": "drbothen"
   },

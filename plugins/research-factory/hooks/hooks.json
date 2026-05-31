@@ -4,7 +4,10 @@
       {
         "matcher": "Write",
         "hooks": [
-          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/require-citation.sh", "timeout": 5 }
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/protect-secrets.sh", "timeout": 5 },
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/require-citation.sh", "timeout": 5 },
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/layer-discipline-guard.sh", "timeout": 5 },
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/forbidden-phrase-guard.sh", "timeout": 5 }
         ]
       }
     ]

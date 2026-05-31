@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "research-factory",
-      "version": "0.1.0",
+      "version": "0.5.0",
       "source": "./plugins/research-factory",
       "description": "Autonomous, citation-faithful research-corpus engine: L1-L6 layer model, two-pass adversarial review, fail-closed citation gates. Domain-agnostic — a new market is config + seed, not code.",
       "category": "research",

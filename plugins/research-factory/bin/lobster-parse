@@ -1,0 +1,147 @@
+#!/usr/bin/env python3
+"""lobster-parse — the .lobster workflow parser (pipeline-as-data, §9).
+
+A .lobster file is a YAML DAG of steps. This parser validates the schema,
+resolves depends_on, detects cycles, and emits a topological execution order.
+The orchestrator reads this; it does not interpret YAML itself.
+
+Usage:
+  lobster-parse validate <file>   # schema + DAG check; exit !=0 on any error
+  lobster-parse order <file>      # print step names in a valid execution order
+  lobster-parse steps <file>      # print "<name>\t<type>\t<agent|skill|workflow>"
+
+YAML is read via `yq -o=json` (already a project dependency); graph logic uses
+only the Python standard library. Deterministic, no LLM.
+"""
+import json
+import subprocess
+import sys
+
+STEP_TYPES = {"agent", "skill", "gate", "human-approval", "loop", "parallel", "sub-workflow"}
+TYPE_REQUIRES = {"agent": "agent", "skill": "skill", "sub-workflow": "workflow"}
+
+
+def die(msg):
+    print(f"lobster-parse: {msg}", file=sys.stderr)
+    sys.exit(2)
+
+
+def load(path):
+    try:
+        out = subprocess.run(["yq", "-o=json", path], capture_output=True, text=True)
+    except FileNotFoundError:
+        die("yq (mikefarah v4) is required but not found")
+    if out.returncode != 0:
+        die(f"could not parse YAML: {path}\n{out.stderr.strip()}")
+    try:
+        return json.loads(out.stdout)
+    except json.JSONDecodeError as e:
+        die(f"invalid YAML/JSON in {path}: {e}")
+
+
+def validate(doc):
+    """Return (ok: bool, errors: list[str], order: list[str])."""
+    errs = []
+    if not isinstance(doc, dict):
+        return False, ["top-level must be a mapping"], []
+    if not doc.get("name"):
+        errs.append("missing top-level 'name'")
+    steps = doc.get("steps")
+    if not isinstance(steps, list) or not steps:
+        errs.append("'steps' must be a non-empty list")
+        return False, errs, []
+
+    names = []
+    for i, s in enumerate(steps):
+        if not isinstance(s, dict):
+            errs.append(f"step[{i}] is not a mapping")
+            continue
+        nm = s.get("name")
+        if not nm:
+            errs.append(f"step[{i}] missing 'name'")
+            continue
+        if nm in names:
+            errs.append(f"duplicate step name: {nm}")
+        names.append(nm)
+        t = s.get("type")
+        if t not in STEP_TYPES:
+            errs.append(f"step '{nm}': type '{t}' not in {sorted(STEP_TYPES)}")
+        req = TYPE_REQUIRES.get(t)
+        if req and not s.get(req):
+            errs.append(f"step '{nm}': type '{t}' requires field '{req}'")
+
+    nameset = set(names)
+    # depends_on resolution
+    edges = {}
+    for s in steps:
+        if not isinstance(s, dict) or not s.get("name"):
+            continue
+        nm = s["name"]
+        deps = s.get("depends_on", []) or []
+        if not isinstance(deps, list):
+            errs.append(f"step '{nm}': depends_on must be a list")
+            deps = []
+        for d in deps:
+            if d not in nameset:
+                errs.append(f"step '{nm}': depends_on references unknown step '{d}'")
+        edges[nm] = [d for d in deps if d in nameset]
+
+    # cycle detection + topological order (Kahn)
+    order = []
+    if not any("depends_on must be a list" in e or "references unknown" in e for e in errs):
+        indeg = {n: 0 for n in names}
+        for n, deps in edges.items():
+            indeg[n] = len(deps)
+        rev = {n: [] for n in names}
+        for n, deps in edges.items():
+            for d in deps:
+                rev[d].append(n)
+        queue = sorted([n for n in names if indeg[n] == 0])
+        while queue:
+            n = queue.pop(0)
+            order.append(n)
+            for m in sorted(rev[n]):
+                indeg[m] -= 1
+                if indeg[m] == 0:
+                    queue.append(m)
+            queue.sort()
+        if len(order) != len(names):
+            stuck = sorted(set(names) - set(order))
+            errs.append(f"dependency cycle detected among: {stuck}")
+            order = []
+
+    return (len(errs) == 0), errs, order
+
+
+def main():
+    if len(sys.argv) != 3:
+        die("usage: lobster-parse {validate|order|steps} <file>")
+    cmd, path = sys.argv[1], sys.argv[2]
+    doc = load(path)
+    ok, errs, order = validate(doc)
+
+    if cmd == "validate":
+        if ok:
+            print(f"lobster validation: PASS ({doc.get('name')}, {len(order)} steps)")
+            sys.exit(0)
+        for e in errs:
+            print(f"  ERROR: {e}", file=sys.stderr)
+        print(f"lobster validation: FAIL ({len(errs)} error(s))", file=sys.stderr)
+        sys.exit(1)
+    elif cmd == "order":
+        if not ok:
+            die("cannot emit order: workflow is invalid (run validate)")
+        print("\n".join(order))
+    elif cmd == "steps":
+        for s in doc.get("steps", []):
+            if not isinstance(s, dict):
+                continue
+            t = s.get("type", "?")
+            ref = s.get(TYPE_REQUIRES.get(t, ""), "") if TYPE_REQUIRES.get(t) else ""
+            print(f"{s.get('name','?')}\t{t}\t{ref}")
+    else:
+        die(f"unknown command: {cmd}")
+
+
+if __name__ == "__main__":
+    main()

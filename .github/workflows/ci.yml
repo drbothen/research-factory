@@ -34,5 +34,12 @@ jobs:
           jq -e '.hooks.PreToolUse[0].hooks[0].command | test("require-citation")' \
             plugins/research-factory/hooks/hooks.json > /dev/null
 
+      - name: Validate all .lobster workflows
+        run: |
+          for f in plugins/research-factory/workflows/*.lobster; do
+            echo "validating $f"
+            python3 plugins/research-factory/bin/lobster-parse validate "$f"
+          done
+
       - name: Run plugin test suite
         run: bash plugins/research-factory/tests/run-all.sh
