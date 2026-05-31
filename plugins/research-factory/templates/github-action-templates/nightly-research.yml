@@ -54,7 +54,10 @@ jobs:
             When the loop reaches an adversary PASS, COMMIT the changes to a new branch named
             claude/<track>-<short-desc> and push it (the state-manager step). Do NOT merge.
             If you make no changes, say so explicitly. Surface anything needing human judgment.
-          # show_full_output: false  (output is public on public repos, §12.2)
+          # show_full_output dumps the FULL conversation (turns + tool calls + results) into the
+          # run log — readable inline, NOT live (emitted when the step finishes). Safe ONLY on a
+          # PRIVATE instance (it can echo tool results incl. secrets). Turn OFF before going public.
+          show_full_output: true
 
       # --- audit: persist the full Claude conversation/execution log (not a black box) ---
       - name: Upload Claude execution log
