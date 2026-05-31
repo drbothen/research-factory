@@ -59,7 +59,7 @@ stays OFF (it echoes tool results incl. secrets into the log).
 - **Workflows 6/7** — missing `portfolio-synth` (v1.0/L6).
 - **Templates** — no `templates/corpus/` generic doc templates for new markets.
 - **Docs/dirs** — missing `docs/FACTORY.md`, `CONVERGENCE.md`; unused `data/`, `checklists/`; no engine `LICENSE` / `CLAUDE.md`.
-- **State model** — `.factory/` on `main`, not the orphan `factory-artifacts` worktree (§11); no INDEX sharding / size-cap hook.
+- **State model** — ✅ `.factory/` now on the orphan `factory-artifacts` branch worktree (§11), gitignored on `main`. Deferred: INDEX sharding, size-cap hook.
 
 ## Open items (not blockers)
 
