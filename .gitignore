@@ -1,0 +1,6 @@
+# Secrets — never commit. All credentials live in GitHub Secrets / OIDC only (BUILD-PLAN §17).
+.mcp.json
+.env
+.env.*
+*.local.env
+.factory/secrets/
