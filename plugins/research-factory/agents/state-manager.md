@@ -30,6 +30,13 @@ Before any other action, say verbatim:
 
 1. **Verify the gate.** Confirm the burst's review record exists: citation-verifier verdicts and the adversary PASS/REVISE. Never commit a doc the adversary marked REVISE or that has unresolved MUST-FIX findings.
 2. **Update `STATE.md`** — the single zero-context-resume file: current phase, current step, decisions log, active branches, drift items. Keep it size-capped; extract history to cycle files when it grows.
+
+   **Pipeline state lives on the orphan `factory-artifacts` branch, NOT on `main` (§11).** `.factory/` is
+   gitignored on `main` and mounted as a git worktree on `factory-artifacts`, so state history is separate
+   from the code/corpus history. Locally: `cd .factory && git add … && git commit && git push origin factory-artifacts`.
+   In a CI runner (fresh checkout, no worktree): fetch `factory-artifacts`, apply the `.factory/` changes onto it,
+   commit, and `git push origin factory-artifacts` — a **separate push** from the corpus PR branch. Never commit
+   `.factory/` onto `main` or onto a corpus PR branch.
 3. **Single-Source-of-Truth.** Each metric (track count, vendor count, canonical dates) lives in exactly one authoritative file; everything else cites it. Never re-derive a canonical value.
 4. **Commit.** Stage the corpus changes and the state update together. Use the project commit-message convention. One burst, one commit.
 

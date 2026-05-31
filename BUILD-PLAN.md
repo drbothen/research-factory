@@ -460,7 +460,7 @@ Every first-class component (the 7 workflows §9, 12 agents §8, 4 repos §6, th
 - **Workflows — 6 of 7** (missing `portfolio-synth.lobster` — it is v1.0/L6).
 - **Templates:** `templates/corpus/` (generic L2/L3/summary/L4 doc templates for *new* markets) not shipped — the OT instance uses its migrated patterns.
 - **Docs/dirs:** have FACTORY-SOUL · LAYER-MODEL · AUTONOMY · HOOKS; missing `docs/FACTORY.md` (engine orientation) + `CONVERGENCE.md`; `data/` and `checklists/` unused (the review spec lives in the instance as `docs/review-spec.md`); engine `LICENSE` + `CLAUDE.md` not added.
-- **State model (§11):** `.factory/STATE.md` committed to `main` (works) rather than the orphan `factory-artifacts` branch worktree; no INDEX+detail sharding or STATE.md size-cap hook yet.
+- **State model (§11):** ✅ `.factory/` now on the orphan `factory-artifacts` branch (mounted as a worktree, gitignored on `main`) — engine + instance. Still deferred: INDEX+detail sharding, STATE.md size-cap hook.
 
 **Behavioral open items (surfaced by acceptance runs):**
 - `build-track`'s adversary loop has **no iteration cap** → runs away (50+ min, never converges) on a heavily-flawed doc → never commits. Needs a max-N-passes cap → commit-what-it-has + PR flagged "did not fully converge, M MUST-FIX remain."
