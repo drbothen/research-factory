@@ -16,6 +16,12 @@ jobs:
       - name: Install bats + jq
         run: sudo apt-get update && sudo apt-get install -y bats jq
 
+      - name: Install yq (mikefarah v4)
+        run: |
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+          yq --version
+
       - name: Validate plugin JSON manifests
         run: |
           for f in .claude-plugin/marketplace.json plugins/research-factory/.claude-plugin/plugin.json plugins/research-factory/hooks/hooks.json; do

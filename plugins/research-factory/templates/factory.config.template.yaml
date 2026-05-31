@@ -1,0 +1,46 @@
+# factory.config.yaml — per-instance config (§5). The engine reads this; it
+# contains ZERO market logic (P10). A new market = a new copy of this file + seed/.
+# Validate with: factory-config.sh validate factory.config.yaml
+
+# --- identity ---
+market: "Example Market"                 # human name                       (required)
+slug: "example"                          # kebab id used in paths/branches   (required)
+audience: "who consumes this corpus"
+phase: "observe-and-report"              # observe-and-report | judgment | productization
+
+# --- the seed (P1) ---
+seed:
+  scope_doc: "seed/scope.md"             # what "done" looks like            (required)
+  source_inventory: "seed/sources.md"    # where evidence comes from         (required)
+  existing_corpus: "corpus/"             # path if migrating an existing corpus
+
+# --- evidence vectors (PER-MARKET — the key generalization). id + name required. ---
+vectors:
+  - {id: V1, name: "Vendor/competitor",       desc: "what vendors build/say/sell"}
+  - {id: V2, name: "Operator/user",           desc: "what buyers experience"}
+  - {id: V3, name: "Influencer/practitioner", desc: "what tracked experts say publicly"}
+
+# --- tracks (the research domains; per-market). slug + name required. ---
+tracks:
+  - {slug: competitive-analysis, name: "Competitive Analysis", sourcing: external-only}
+  - {slug: regulatory-governance, name: "Regulatory & Governance", sourcing: primary-source}
+
+# --- editorial profile (mostly inherited generic defaults) ---
+editorial:
+  forbidden_phrases_extra: []            # market-specific additions
+  per_track_sourcing_default: external-only
+  canonical_values: "seed/canonical-values.md"
+
+# --- review + autonomy ---
+review:
+  builder_model_tier: implementation     # sonnet
+  reviewer_model_tier: adversary         # MUST be a different family than builder
+  convergence:
+    novelty_threshold: 0.15
+    clean_passes_required: 3
+autonomy_level: 3                         # 3 = human gate on every merge (start here)
+
+# --- deliverables this market produces ---
+deliverables:
+  research: [l3-findings, l3-tldr, track-summary, l4-synthesis]
+  pm: [concept-narrative, six-pager, prd, user-stories, acceptance-plan]
