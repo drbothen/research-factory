@@ -28,20 +28,32 @@ jobs:
       - name: Claude builder — run build-track on the next work-item
         id: claude
         uses: anthropics/claude-code-action@v1
+        env:
+          # search-tool MCP keys — expanded by ${VAR} in .github/mcp.json (never hardcoded)
+          PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}   # use workflow token — avoids needing the Claude GitHub App
+          # With the Claude GitHub App now installed, the App token (default OIDC path) has the
+          # push/PR permissions; github_token also works. Keeping github_token for determinism.
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           # Enable the engine plugin natively (verified input keys). If drbothen/research-factory
           # is PRIVATE, the runner needs cross-repo read (a PAT secret); if public, this works as-is.
           plugin_marketplaces: |
             https://github.com/drbothen/research-factory.git
           plugins: |
             research-factory@research-factory
-          claude_args: "--model claude-sonnet-4-6"
+          # --mcp-config enables the search tools; --allowedTools must permit them + file writes
+          claude_args: >-
+            --model claude-sonnet-4-6
+            --mcp-config .github/mcp.json
+            --allowedTools "mcp__perplexity__*,mcp__tavily__*,Read,Write,Edit,MultiEdit,Bash,Glob,Grep,Task,WebFetch,WebSearch"
           prompt: |
             Run the research-factory build-track skill on ${{ github.event.inputs.track || 'the next open work-item in WORK-BACKLOG / STATE.md' }}.
             Draft/advance → editorial-sweep → citation-verify → adversary loop to PASS → state-manager.
-            Open a PR with the result. DO NOT merge. Surface anything needing human judgment.
+            When the loop reaches an adversary PASS, COMMIT the changes to a new branch named
+            claude/<track>-<short-desc> and push it (the state-manager step). Do NOT merge.
+            If you make no changes, say so explicitly. Surface anything needing human judgment.
           # show_full_output: false  (output is public on public repos, §12.2)
 
       # --- audit: persist the full Claude conversation/execution log (not a black box) ---
@@ -62,3 +74,15 @@ jobs:
             echo "- branch_name: \`${{ steps.claude.outputs.branch_name }}\`  ← empty = Claude made no commit"
             echo "- full conversation log: artifact \`claude-execution-log-${{ github.run_id }}\` (resume with --resume <session_id>)"
           } >> "$GITHUB_STEP_SUMMARY"
+
+      # claude-code-action only PUSHES a branch; it does not open a PR. Do that here (autonomy 3 = PR, never merge).
+      - name: Open a PR for Claude's branch
+        if: ${{ steps.claude.outputs.branch_name != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create --repo "${{ github.repository }}" \
+            --head "${{ steps.claude.outputs.branch_name }}" --base main \
+            --title "Night shift: ${{ github.event.inputs.track || 'work-item' }}" \
+            --body "Automated build-track run (adversary PASS required before push). Human merges — autonomy 3. Conversation log: artifact claude-execution-log-${{ github.run_id }}." \
+            || echo "PR may already exist for ${{ steps.claude.outputs.branch_name }}"

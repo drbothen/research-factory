@@ -1,0 +1,16 @@
+{
+  "//": "Installed to the instance as .github/mcp.json. Referenced via claude_args --mcp-config.",
+  "//keys": "Keys are expanded from job env (GitHub Secrets) — NEVER hardcode them here.",
+  "mcpServers": {
+    "perplexity": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@perplexity-ai/mcp-server"],
+      "env": { "PERPLEXITY_API_KEY": "${PERPLEXITY_API_KEY}" }
+    },
+    "tavily": {
+      "type": "http",
+      "url": "https://mcp.tavily.com/mcp/?tavilyApiKey=${TAVILY_API_KEY}"
+    }
+  }
+}
