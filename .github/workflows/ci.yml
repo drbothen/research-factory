@@ -31,7 +31,10 @@ jobs:
 
       - name: Assert hooks.json uses the wrapped {hooks:{event:[...]}} shape
         run: |
-          jq -e '.hooks.PreToolUse[0].hooks[0].command | test("require-citation")' \
+          # wrapped shape: .hooks.<event>[].hooks[].command (order-independent)
+          jq -e '.hooks.PreToolUse[0].hooks | type == "array" and length >= 1' \
+            plugins/research-factory/hooks/hooks.json > /dev/null
+          jq -e '[.hooks.PreToolUse[0].hooks[].command] | any(test("require-citation"))' \
             plugins/research-factory/hooks/hooks.json > /dev/null
 
       - name: Validate all .lobster workflows
