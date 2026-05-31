@@ -7,10 +7,12 @@ Last updated: 2026-05-31.
 
 ## Current phase
 
-**v0.9 COMPONENTS BUILT** (pm-doc-writer agent, pm-doc-chain.lobster + Dev-Readiness gate, 5 pm/ templates,
-command shim; manifests 0.9.0; 6 workflows validate, 34 bats green). **Next: the v0.9 acceptance RUN** —
-a selected OT L4/L5 finding through pm-doc-chain → dev-ready PRD + stories passing the Dev-Readiness Check
-(by-hand, like the v0.5 run). Then v1.0.
+**v0.9 COMPLETE.** Next: **v1.0** — portfolio (L6) + a real 2nd market via /init-market + engine marketplace
+publish + `bump-engine` cross-instance version propagation.
+
+Also notable: **PR #1 was human-merged** — federal-dod-buyer night-shift work is now `status/active` on the
+instance `main` (the autonomy-3 human-merge step, closing the full v0.8 loop end to end), and the night-shift
+state-manager recorded its run in the instance `.factory/STATE.md` track build log.
 
 ## Roadmap status (BUILD-PLAN §15)
 
@@ -20,7 +22,7 @@ a selected OT L4/L5 finding through pm-doc-chain → dev-ready PRD + stories pas
 | v0.1 — engine skeleton + OT instance | ✅ done | require-citation hook proven headless; build-track → adversary PASS on one track; config loader |
 | v0.5 — L1→L5 pipeline | ✅ done | L3→L4 synth → adversary PASS; L5 judgment through human gate (REVISE×3→PASS); 34 bats green |
 | v0.8 — Actions autonomy + /init-market | ✅ done | live night-shift run → **PR #1** (real fixes, autonomy 3); Codex+Gemini review green; /init-market throwaway scaffold |
-| v0.9 — PM pipeline | 🟡 components built | a selected finding → dev-ready PRD + stories passing the readiness check (acceptance RUN pending) |
+| v0.9 — PM pipeline | ✅ done | OT operationalization-gap finding → concept + 7-section PRD + 7-field stories; Dev-Readiness Check ran (2 CLEAR, 5 flagged as labeled Assumptions/Open-Questions, no invention) → `1898andCo/ot-ics-research/pm/operationalization-gap/` |
 | v1.0 — portfolio (L6) + 2nd market + marketplace publish | ⬜ | 2nd market to Beta from cold seed; L6 brief; engine version-bump propagation |
 
 ## Repos

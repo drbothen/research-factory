@@ -11,7 +11,7 @@ This file records what each phase delivered.
   gate, 7 failure modes] → user-stories → acceptance-plan → human-approval → commit. Each judgment point human-gated.
 - `templates/pm/`: concept-narrative, six-pager, 7-section PRD, 7-field user-stories, acceptance-plan
   (derived from the spec + the OPRA worked example).
-- Command shim `/pm-doc-chain`. Components built; acceptance RUN (OT finding → dev-ready PRD) pending.
+- Command shim `/pm-doc-chain`. Acceptance: OT operationalization-gap finding → concept + 7-section PRD + 7-field stories; Dev-Readiness Check ran faithfully (flags → labeled Assumptions/Open-Questions, no invention).
 
 ## 0.8.0 — Actions autonomy + market instantiation (2026-05-31)
 
