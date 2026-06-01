@@ -1,222 +1,114 @@
-# STATE — research-factory engine (self-dogfooded build state)
+---
+document_type: pipeline-state
+level: ops
+version: "2.0"
+status: active
+producer: state-manager
+timestamp: 2026-06-01T23:23:05
+phase: 0
+inputs: []
+input-hash: "[live-state]"
+traces_to: ""
+project: "research-factory"
+mode: "brownfield"
+current_step: "migration: hybrid-vsdd → full vsdd-factory plugin"
+current_cycle: "v1.0-brownfield-migration"
+dtu_required: false
+---
 
-**The one file to read to resume.** Authoritative, versioned, in-repo. Pairs with `BUILD-PLAN.md`
-(the design) and `git log` (the artifacts). My machine-local memory is only a pointer to this.
+# Pipeline State: research-factory engine
 
-Last updated: 2026-06-01 (item-4 engine machinery DONE + portfolio repo stood up; first L6 run BLOCKED).
+> Migrated 2026-06-01 from a hand-rolled hybrid-vsdd STATE to the full vsdd-factory plugin
+> (dogfood swap: the engine stays the product; vsdd-factory is now the tool that builds it).
+> Full pre-migration history preserved verbatim at
+> `cycles/v1.0-brownfield-migration/legacy-research-factory-state.md`.
 
-## ▶ RESUME NEXT SESSION — item 4 is 3/4 done; the first L6 run is BLOCKED on medical-device L4
+## Project Metadata
 
-**Item 4 steps 1–3 are DONE this session; step 4 (the first L6 brief) is BLOCKED.** What landed:
-- ✅ **Step 1 — `portfolio-synth.lobster`** (the 7th workflow) + ✅ **step 2 — `L6-portfolio-synthesis.md`**
-  template, **+ `portfolio-rollup.yml` Action template + `templates/portfolio/manifest.yaml` + synthesizer
-  agent extended to L6**. Shipped in **engine PR #7 (merged `9ced663`)**. CI green; suite at 35 bats.
-  Workflows now **7/7**. (Real org is **`1898andCo`**; the engine text says `<your-org>` post-scrub.)
-- ✅ **Step 3 — `1898andCo/research-portfolio` CREATED** (PRIVATE) from the engine templates: `main` has
-  `portfolio/manifest.yaml` (registers `ot-ics` + `medical-device`) + `.github/workflows/portfolio-rollup.yml`
-  + `.github/mcp.json` + `.claude/settings.json` (engine plugin enabled) + READMEs; `factory-artifacts`
-  branch seeded with its own `STATE.md`. Local clone: `~/Dev/research-portfolio`.
-- ⛔ **Step 4 — BLOCKED.** A genuine OT × medical-device L6 needs **each** market's named L4/L5. **OT is
-  ready** (merged `corpus/synthesis/ot-security-l4-convergence-brief-v2.md` (L4) +
-  `…-v05-acceptance-judgment.md` (L5) on `main`). **medical-device is NOT:** its `main` has **no merged
-  corpus at all** — its `regulatory-governance` + `vendor-landscape` **L3** findings sit in **unmerged PRs
-  (#2, #3)**, and a single track cannot yield an L4 cross-track synthesis. So there is no medical-device
-  L4/L5 to synthesize. Running L6 now would either be OT-only (not cross-market) or reach into
-  medical-device's unmerged L3 (a layer-discipline violation). **STATE's old claim that market #2 was
-  "proven to adversary PASS" referred to a PR that was never human-merged.**
+| Field | Value |
+|-------|-------|
+| **Product** | research-factory engine (domain-agnostic research pipeline, ships as a Claude Code plugin) |
+| **Repository** | github.com/drbothen/research-factory |
+| **Mode** | brownfield |
+| **Language** | Bash + Lobster workflows + Markdown agents/skills |
+| **Target Workspace** | plugins/research-factory/ |
+| **Started** | 2026-06-01 (vsdd onboarding) |
+| **Last Updated** | 2026-06-01 |
+| **Current Phase** | 0 |
+| **Current Step** | brownfield ingestion (not yet run) |
 
-**To unblock step 4 (operator decision needed — see the 3 options I surfaced):**
-- **(A) Make medical-device L6-ready first:** review+merge its L3 PRs (#2,#3), build ≥1 more track, run the
-  L4 `cross-track-synth` → (optional L5) → then `portfolio-rollup` → first *real* L6 brief. Most faithful;
-  most paid effort.
-- **(B) Machinery-shakedown L6 now:** run `portfolio-rollup` with OT-only (or OT + an explicitly-flagged
-  "medical-device: no L4/L5 yet, absent" note) to prove the pipeline end-to-end — NOT the true cross-market
-  acceptance. Cheap; proves plumbing.
-- **(C) Defer the run** until medical-device matures.
+## Phase Progress
 
-**Before any run:** set `1898andCo/research-portfolio` repo secrets — `ANTHROPIC_API_KEY`,
-`PERPLEXITY_API_KEY`, `TAVILY_API_KEY`, and **`INSTANCE_READ_TOKEN`** (fine-grained PAT or App token with
-**contents:read** on both instance repos — the rollup pulls private L4/L5 across the org boundary).
+| Phase | Status | Started | Completed | Gate | Finding Progression |
+|-------|--------|---------|-----------|------|---------------------|
+| 0: Codebase Ingestion | in-progress | 2026-06-01 | | | |
+| 1: Spec Crystallization | not-started | | | | |
+| 2: Story Decomposition | not-started | | | | |
+| 3: TDD Implementation | not-started | | | | |
+| 4: Holdout Evaluation | not-started | | | | |
+| 5: Adversarial Refinement | not-started | | | | |
+| 6: Formal Hardening | not-started | | | | |
+| 7: Convergence | not-started | | | | |
 
-Then item #5 (engine marketplace publish + `bump-engine` propagation) closes v1.0.
+## Current Phase Steps
 
-Everything below is the durable detail. **Read this file top-to-bottom on a cold resume.**
+| Step | Agent | Status | Output |
+|------|-------|--------|--------|
+| Activate vsdd-factory | human | done | .claude/settings.local.json (agent=orchestrator, platform=darwin-arm64) |
+| Mount .factory + scaffold skeleton | state-manager | done | specs/ stories/ cycles/ … |
+| Migrate STATE → v2.0 schema | state-manager | in-progress | this file |
+| Brownfield ingest of existing engine | orchestrator | not-started | /vsdd-factory:brownfield-ingest |
 
-## Current phase
+## Brownfield Subject — engine roadmap carried forward (pre-vsdd axis)
 
-**v1.0 IN PROGRESS.** Done: item 1 (cap, engine PR #1) + state-restore (PR #2) + item 2 (cold-start, PR #3)
-+ review-spec (PR #4) + cross-family-review-actually-reviews (PR #5). **Item 3 — 2nd market — PROVEN:**
-`<your-org>/medical-device-security-research` created cold; `regulatory-governance` driven to **adversary
-PASS** from the cold seed (the "config + seed, not code" thesis, with ZERO engine code); state-restore
-proven live; cross-family review (Codex+Gemini) validated catching planted errors. Remaining for full Beta:
-build the other 5 tracks (mechanical, autonomy 3). Remaining v1.0: **item 4 L6 portfolio · item 5 release**.
+> The engine's own delivery roadmap (BUILD-PLAN.md §15), distinct from the vsdd phases above.
+> Detail + evidence: `cycles/v1.0-brownfield-migration/legacy-research-factory-state.md`.
 
-> **Template repo was refreshed first** (`drbothen/research-factory-template`): its 4 workflows had drifted
-> behind the engine (missing v0.8 hardening + the v1.0 cap/state-restore fixes); also added `.github/mcp.json`
-> + `.factory/` gitignore. Manual stand-in for the not-yet-built `bump-engine` propagation (item #5).
-
-> Note: "engine PR #1/#2" = PRs on `drbothen/research-factory` (the engine). Distinct from instance
-> `<your-org>/ot-ics-research` PRs (its PR #1 federal-dod-buyer, PR #2 international-cohort).
-
-Also notable: **PR #1 was human-merged** — federal-dod-buyer night-shift work is now `status/active` on the
-instance `main` (the autonomy-3 human-merge step, closing the full v0.8 loop end to end), and the night-shift
-state-manager recorded its run in the instance `.factory/STATE.md` track build log.
-
-### What's left to v1.0 (recommended order)
-
-1. ✅ **`build-track` iteration cap** — DONE (engine PR #1, merged `bee28fa`). `convergence.max_passes: 6`
-   threaded through the 4 loop lobsters + orchestrator + build-track SKILL + nightly/ingest Actions. On cap →
-   commit-what-it-has + PR flagged "did not fully converge, M MUST-FIX remain." Cap value validated as sane:
-   the international-cohort run converged at **pass 5** (< 6), so 6 would not have false-triggered (but it's snug).
-2. ✅ **Cold-start prerequisites** — DONE (engine PR #3, merged `caf4cea`). Shipped: MIT `LICENSE`; root
-   `CLAUDE.md` (engine constitution + layout + build/test); `docs/FACTORY.md` (operator orientation);
-   `templates/corpus/` (L2-baseline +tldr, L3-findings +tldr with the mandatory vector-coverage table,
-   track-summary, L4-cross-track-synthesis, README) — wired into the build-track + init-market skills.
-3. ✅ **2nd market cold via `/init-market`** — DONE (acceptance met). `medical-device-security` created cold
-   from the refreshed template; `regulatory-governance` → adversary PASS from the cold seed (zero engine code);
-   state-restore proven live; cross-family review validated. Also surfaced + fixed two cold-start gaps the OT
-   instance had masked: the generic `docs/review-spec.md` (PR #4) and the non-functioning cross-family review
-   (PR #5). Full Beta = build the remaining 5 tracks (mechanical).
-4. **L6 portfolio** — engine machinery ✅ (engine PR #7, `9ced663`: `portfolio-synth.lobster` 7th workflow +
-   `L6-portfolio-synthesis.md` template + `portfolio-rollup.yml` + `templates/portfolio/manifest.yaml` +
-   synthesizer→L6). Portfolio repo ✅ (`1898andCo/research-portfolio`, private, stood up). **Acceptance
-   (first human-approved L6 brief) BLOCKED ← here:** medical-device has no merged L4/L5 (L3 in unmerged PRs).
-   See the RESUME block at top for the 3 unblock options + the required repo secrets.
-5. **Engine release** — marketplace publish + `bump-engine` cross-instance version-propagation Action. Acceptance: a version bump propagates to instances via PR.
-(Optional/stretch: 5 deferred state hooks · `github-ops` + orchestrator sequence playbooks · WASM `factory-dispatcher` · autonomy 3.5.)
-
-### State-model validation RESULT (2026-06-01) — run `26732442937` on `international-cohort`
-
-The in-flight validation run completed **success** (51m34s; converged at adversary pass 5, not a runaway).
-- **(a) ✅** `claude/international-cohort-beta-advance` branch + **PR #2** opened on the instance.
-- **(b) ❌→FIXED** Persist step logged `no .factory state written this run`; `factory-artifacts` HEAD never
-  moved off pre-run `937a1f6`. **Root cause:** the night-shift loop persisted `.factory/` at the END but never
-  RESTORED it at the START — the instance checkout begins empty (`.factory` gitignored on `main`), so the
-  state-manager had no STATE.md to append to → wrote nothing → persist pushed nothing. **Fixed in engine PR #2
-  (merged `fbf2ffc`):** added a "Restore pipeline state from factory-artifacts" step after checkout (mirror of
-  persist), and clarified the state-manager's CI role (agent WRITES the workspace `.factory/STATE.md`; the
-  workflow owns the branch round-trip). **Not yet re-validated by a live run** — next night-shift run should
-  show a `### international-cohort — …` entry appended to the instance Track build log + HEAD advancing.
-- **(c) ✅ (trivially)** instance Track build log un-clobbered — but only because (b) wrote nothing.
-
-## Roadmap status (BUILD-PLAN §15)
-
-| Phase | Status | Acceptance evidence |
+| Engine item | Status | Evidence |
 |---|---|---|
-| P0 — prerequisites | ✅ done | 3 vendor keys validated in hello-world Action; secrets hygiene |
-| v0.1 — engine skeleton + OT instance | ✅ done | require-citation hook proven headless; build-track → adversary PASS on one track; config loader |
-| v0.5 — L1→L5 pipeline | ✅ done | L3→L4 synth → adversary PASS; L5 judgment through human gate (REVISE×3→PASS); 34 bats green |
-| v0.8 — Actions autonomy + /init-market | ✅ done | live night-shift run → **PR #1** (real fixes, autonomy 3); Codex+Gemini review green; /init-market throwaway scaffold |
-| v0.9 — PM pipeline | ✅ done | OT operationalization-gap finding → concept + 7-section PRD + 7-field stories; Dev-Readiness Check ran (2 CLEAR, 5 flagged as labeled Assumptions/Open-Questions, no invention) → `<your-org>/ot-ics-research/pm/operationalization-gap/` |
-| v1.0 — portfolio (L6) + 2nd market + marketplace publish | ⬜ | 2nd market to Beta from cold seed; L6 brief; engine version-bump propagation |
+| 1 — build-track iteration cap | ✅ done | engine PR #1 (`bee28fa`) |
+| 2 — cold-start prerequisites | ✅ done | engine PR #3 (`caf4cea`) |
+| 3 — 2nd market cold via /init-market | ✅ done | medical-device regulatory-governance → adversary PASS |
+| 4 — L6 portfolio | 🟡 machinery done, first run BLOCKED | engine PR #7 (`9ced663`); see Blocking Issues |
+| 5 — engine release (marketplace + bump-engine) | ⬜ not-started | closes v1.0 |
 
-## Repos
+## Decisions Log
 
-| Repo | Role | Visibility |
-|---|---|---|
-| `drbothen/research-factory` | the engine (this repo) | **public** (so instances clone the marketplace) |
-| `drbothen/research-factory-template` | thin instance starter (`gh repo create --template`) | **public** (org refs scrubbed + history collapsed first) |
-| `<your-org>/ot-ics-research` | instance #1 — OT/ICS, the **canonical** OT corpus | private |
-| `<your-org>/medical-device-security-research` | instance #2 — Healthcare & Medical-Device (cold market) | private |
-| `<your-org>/research-portfolio` | **L6 cross-market** portfolio (manifest + `portfolio-rollup`) — stood up this session | private |
+| ID | Decision | Rationale | Phase | Date | Made By |
+|----|----------|-----------|-------|------|---------|
+| D-001 | Migrate hybrid-vsdd → full vsdd-factory plugin | Adopt the maintained plugin's agents/hooks/skills instead of the hand-rolled subset | 0 | 2026-06-01 | human |
+| D-002 | Dogfood swap, not engine replacement | The research-factory engine stays the product; vsdd-factory is the build tool | 0 | 2026-06-01 | human |
+| D-003 | Migrate in place on factory-artifacts (no history rewrite) | Preserve the build trail; legacy STATE kept as a cycle file | 0 | 2026-06-01 | human |
+| D-004 | mode = brownfield | Engine is a mature existing codebase; vsdd ingests then carries items #4/#5 as features | 0 | 2026-06-01 | state-manager |
+| D-005 | max_passes cap = 6 (factory.config convergence.max_passes) | Adversary-loop runaway guard; instance-tunable | — | 2026-06-01 | human |
+| D-006 | Workflow (not state-manager agent) owns factory-artifacts round-trip in CI | Deterministic restore+persist; avoids double-push | — | 2026-06-01 | human |
+| D-007 | Engine repo public, MIT license | Public marketplace others clone from | — | 2026-06-01 | human |
 
-## Deployment fixes baked into the Action templates (so the next market just works)
+## Skip Log
 
-The v0.8 live shakedown surfaced these; all corrected in `templates/github-action-templates/`:
-1. Org must **enable GitHub Actions** for the instance repo (org-admin).
-2. Builder workflows need `permissions: id-token: write` (claude-code-action OIDC).
-3. The **Claude GitHub App** must be installed on the org (it has `workflows:write`). Do NOT override
-   auth with `github_token` — GITHUB_TOKEN can't push `.github/workflows/` changes, and PRs it opens
-   don't trigger `on-pr-review`. Use the App token (omit `github_token`).
-4. `plugin_marketplaces` needs the full `https://github.com/<org>/<repo>.git` URL (`.git` suffix).
-5. claude-code-action only **pushes a branch**; it never opens a PR — open it explicitly.
-6. Its `branch_name` output is **empty when Claude pushes via Bash** — detect the `claude/*` branch instead.
-7. Engine repo must be **public** for the marketplace clone (scrub any secrets from history first — we used filter-repo).
-8. Codex review of a bot PR needs `allow-bots: true` + `allow-bot-users: "claude[bot]"`.
-9. Gemini needs env `GEMINI_CLI_TRUST_WORKSPACE=true` (headless trust).
-10. Gemini `gemini_model` must be UNSET or a **valid** generateContent model (`gemini-3-pro` is NOT valid).
+| Step | Skipped? | Justification |
+|------|----------|---------------|
+| UX Spec | yes | Engine is CLI + GitHub Actions + Markdown agents; no UI surfaces |
+| DTU | yes | No third-party service behavioral clones required to build the engine |
 
-Audit: every builder run uploads the `claude-execution-log` artifact (`execution_file`). `show_full_output`
-stays OFF (it echoes tool results incl. secrets into the log).
+## Blocking Issues
 
-## Deferred components (built lean vs BUILD-PLAN §7–§12; see §15.1 for the full delta)
+| ID | Issue | Severity | Blocking Phase | Owner | Resolution |
+|----|-------|----------|---------------|-------|------------|
+| B-001 | First real L6 cross-market brief blocked: medical-device has no merged L4/L5 (L3 in unmerged PRs #2/#3); OT-only would not be cross-market | high | engine item #4 | human | Options A/B/C in legacy STATE "unblock step 4"; needs operator pick + portfolio repo secrets (incl. INSTANCE_READ_TOKEN) |
 
-- **Hooks 4/9** (have: require-citation, layer-discipline, protect-secrets, forbidden-phrase). Deferred (state-dependent, in `docs/HOOKS.md`): source-faithfulness-guard, anchor-not-strip-guard, convergence-tracker, protect-canonical, factory-branch-guard.
-- **Agents 11/12** — missing `github-ops`; no `orchestrator/*-sequence` playbooks.
-- **Workflows 6/7** — missing `portfolio-synth` (v1.0/L6).
-- **Templates** — ✅ `templates/corpus/` shipped (engine PR #3): L2-baseline+tldr, L3-findings+tldr, track-summary, L4-cross-track-synthesis, README.
-- **Docs/dirs** — ✅ `docs/FACTORY.md` + engine `LICENSE` (MIT) + root `CLAUDE.md` shipped (engine PR #3). Still missing: `CONVERGENCE.md`; unused `data/`, `checklists/`.
-- **State model** — ✅ `.factory/` now on the orphan `factory-artifacts` branch worktree (§11), gitignored on `main`. Deferred: INDEX sharding, size-cap hook.
+## Session Resume Checkpoint
 
-## Open items (not blockers)
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-06-01 |
+| **Position** | Migration to full vsdd-factory complete through STATE v2.0; next = run /vsdd-factory:brownfield-ingest to produce vsdd specs from the existing engine, OR resolve B-001 to finish engine item #4 |
+| **Convergence counter** | n/a (pre-adversarial) |
 
-- ✅ **build-track iteration cap** — DONE (engine PR #1, `bee28fa`). See v1.0 list item 1.
-- ✅ **state-restore PROVEN live:** the first cold build on `medical-device-security` (regulatory-governance)
-  advanced `factory-artifacts` with a `### regulatory-governance — 2026-06-01` track-build-log entry. The
-  PR #2 (`fbf2ffc`) restore-at-start works end to end on a fresh instance.
-- ✅ **on-pr-review now actually reviews + comments** — engine PR #5. Was a no-op (Codex never got the diff;
-  no comment-posting). Now diff-scoped, posts findings as PR comments, scoped Perplexity MCP, audit artifacts.
-  Validated on a planted-error PR (both reviewers caught a false "HIPAA final" claim + an unsourced Type-2
-  claim; Gemini's Perplexity found the real figure). Resolves the old "0 comments" item.
-- **ingest.yml + weekly-maintenance.yml have NO state round-trip:** unlike nightly-research they have neither a
-  restore nor a persist step, so they never record `.factory/` state at all. Give them the same symmetric
-  restore+persist pair (follow-up to PR #2).
-- **cap value (6) is snug:** international-cohort converged at pass 5. A genuinely harder track needing 6–7 real
-  revise passes would get prematurely flagged "did not converge." Revisit `max_passes` if false-flags appear;
-  it's a per-market `factory.config` knob, so an instance can raise it.
-- **Codex reviewer's Perplexity MCP falls back to WebSearch:** Gemini's Perplexity MCP works (verified
-  citations live); Codex logs "MCP available but called via WebSearch/WebFetch fallback" — the inline
-  `codex-args` `mcp_servers` env propagation isn't landing the key. Codex still reviews well via fallback;
-  refine the Codex MCP env wiring as a follow-up (low priority — review works).
-- **state-manager CI commit mechanism:** the regulatory-governance state push carried the agent's commit
-  voice, so the agent may self-push `factory-artifacts` in CI despite the division-of-labor note (the
-  workflow's persist step should own it). Net result correct; confirm one canonical path.
-- **`pull_request` runs use the PR-HEAD-branch workflow** (not main) — so workflow fixes reach a market's
-  reviews on the NEXT build-track PR (branched from updated main), not retroactively on in-flight PRs. Keep
-  this in mind when shipping `on-pr-review`/Action changes.
-- ✅ **engine `factory-artifacts` history PURGED:** rewrote the branch with `git filter-repo --path specs/
-  --invert-paths` and force-pushed (`a521fb1…8cd2848`). Fresh-clone verified: `STATE.md` is the only path in
-  all 9 commits; no seed/research blobs recoverable. (GitHub may keep unreachable old commits by exact SHA
-  until server-side GC — not reachable via any ref/clone/browse; fine for non-secret content.) Residual:
-  STATE.md still narrates market-#2 detail (regulatory triad, incidents) in prose — public-fact; redact
-  further only if full market-neutrality is wanted.
-- **company-specific forbidden phrases moved out of the engine hook (P10):** `forbidden-phrase-guard.sh` now
-  carries only generic positioning patterns; market-specific company names belong in each instance's
-  `editorial.forbidden_phrases_extra`. Add them to the OT + medical-device instance configs to restore that catch.
+## Historical Content
 
-## Decisions log
-
-- 2026-05-31: `<your-org>/ot-ics-research` is the **canonical** OT corpus (cutover; old ai-knowledge-base →
-  ot-security-research mirror chain is legacy).
-- 2026-05-31: engine repo made **public**; secret fragment scrubbed from history before publishing.
-- 2026-05-31: **researcher prefers MCP search** (Perplexity/Tavily), built-in WebSearch/WebFetch fallback.
-- 2026-05-31: **never cancel an in-flight paid run without asking** (operator rule).
-- 2026-06-01: **`max_passes` cap = 6** (default) on the adversary loop — the canonical home is
-  `factory.config` `convergence.max_passes`; lobsters mirror the default. Autonomous loops commit-flagged on
-  cap; human-gated loops surface-to-human.
-- 2026-06-01: **the workflow (not the state-manager agent) owns the `factory-artifacts` round-trip in CI** —
-  restore-at-start + persist-at-end are deterministic bash steps; the agent only writes the workspace
-  `.factory/STATE.md`. Avoids double-push and fragile haiku git surgery.
-- 2026-06-01: **also commit the cap fix to the engine on a feature branch → PR → squash-merge** (operator chose
-  push-and-merge over hold-local); CI `test` gate must be green before merge.
-- 2026-06-01: **engine LICENSE = MIT** (operator choice — maximal adoption for a public marketplace others clone).
-- 2026-06-01: **market #2 = Healthcare & Medical-Device Security** (`<your-org>/medical-device-security-research`) —
-  closest cyber-physical sibling to OT; chosen for L6 portfolio value + distinct FDA/HDO/HTM vectors. Seed from a
-  Perplexity Sonar Deep Research landscape (47 sources).
-- 2026-06-01: **reviewers get scoped Perplexity MCP** (operator request) — verification-only (review-spec-fenced);
-  Gemini fetches/checks the cited source (P3). **No model is a black box** (operator rule): every model uploads its
-  full output as an artifact (Claude builder, Codex, Gemini).
-- 2026-06-01: **the workflow owns the factory-artifacts round-trip in CI**, and `pull_request` runs use the
-  PR-head-branch workflow — Action/review changes land on the NEXT build-track PR, not retroactively.
-
-## How to resume (cold session, zero prior context)
-
-**This file lives on the orphan `factory-artifacts` branch — it is NOT on `main`.** A fresh `main` clone won't
-see it. Get it with: `git fetch origin factory-artifacts && git worktree add .factory factory-artifacts`
-(or read once: `git show origin/factory-artifacts:STATE.md`). The engine README + BUILD-PLAN §18 on `main` point here.
-
-1. **Repos** (clone all three): `drbothen/research-factory` (engine, public), `drbothen/research-factory-template` (private), `<your-org>/ot-ics-research` (instance, private). Local clones on this machine: `~/Dev/research-factory`, `~/Dev/ot-ics-research`. `gh` is authed as **drbothen** (admin on <your-org>).
-2. **Read:** this file (full), then `BUILD-PLAN.md` §1 (constitution), §15+§15.1 (roadmap + status/delta), §18 (bootstrap). `CHANGELOG.md` for per-phase deltas.
-3. **Verify the live proof:** `gh pr view 1 --repo <your-org>/ot-ics-research` (merged night-shift PR); `git log --oneline` in each repo.
-4. **First action on resume:** check the in-flight run above (`26732442937`). Then pick up at **What's left to v1.0** — start with the `build-track` iteration cap.
-5. Secrets are set on the instance (ANTHROPIC/OPENAI/GEMINI/PERPLEXITY/TAVILY) + engine; never re-commit them.
+| Content | Location |
+|---------|----------|
+| Pre-migration hand-rolled STATE (222 lines: deployment fixes, open items, full decisions) | `cycles/v1.0-brownfield-migration/legacy-research-factory-state.md` |
+| Engine design + roadmap | `BUILD-PLAN.md` (on main) §15 / §15.1 |
+| Artifact trail | `git log` (main + factory-artifacts) |
