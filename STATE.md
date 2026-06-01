@@ -7,11 +7,12 @@ Last updated: 2026-06-01.
 
 ## Current phase
 
-**v1.0 IN PROGRESS.** Done: item 1 (`build-track` iteration cap, engine PR #1) + state-loop restore fix
-(engine PR #2) + item 2 (cold-start prerequisites, engine PR #3). **Item 3 — 2nd market — SCAFFOLDED:**
-`1898andCo/medical-device-security-research` created cold via the init-market procedure (config + seed +
-state + workflows). **Remaining for item-3 acceptance: set instance secrets + org App, then prove ONE
-track to adversary PASS** (then Beta). Remaining v1.0: L6 portfolio · marketplace publish + `bump-engine`.
+**v1.0 IN PROGRESS.** Done: item 1 (cap, engine PR #1) + state-restore (PR #2) + item 2 (cold-start, PR #3)
++ review-spec (PR #4) + cross-family-review-actually-reviews (PR #5). **Item 3 — 2nd market — PROVEN:**
+`1898andCo/medical-device-security-research` created cold; `regulatory-governance` driven to **adversary
+PASS** from the cold seed (the "config + seed, not code" thesis, with ZERO engine code); state-restore
+proven live; cross-family review (Codex+Gemini) validated catching planted errors. Remaining for full Beta:
+build the other 5 tracks (mechanical, autonomy 3). Remaining v1.0: **item 4 L6 portfolio · item 5 release**.
 
 > **Template repo was refreshed first** (`drbothen/research-factory-template`): its 4 workflows had drifted
 > behind the engine (missing v0.8 hardening + the v1.0 cap/state-restore fixes); also added `.github/mcp.json`
@@ -34,8 +35,12 @@ state-manager recorded its run in the instance `.factory/STATE.md` track build l
    `CLAUDE.md` (engine constitution + layout + build/test); `docs/FACTORY.md` (operator orientation);
    `templates/corpus/` (L2-baseline +tldr, L3-findings +tldr with the mandatory vector-coverage table,
    track-summary, L4-cross-track-synthesis, README) — wired into the build-track + init-market skills.
-3. **2nd market cold via `/init-market`** — the real proof of "config + seed, not code". Acceptance: 2nd market → Beta from a cold seed. **← NEXT**
-4. **L6 portfolio** — `research-portfolio` repo + `portfolio-synth.lobster` (the 7th workflow). Acceptance: an L6 cross-market brief, human-approved.
+3. ✅ **2nd market cold via `/init-market`** — DONE (acceptance met). `medical-device-security` created cold
+   from the refreshed template; `regulatory-governance` → adversary PASS from the cold seed (zero engine code);
+   state-restore proven live; cross-family review validated. Also surfaced + fixed two cold-start gaps the OT
+   instance had masked: the generic `docs/review-spec.md` (PR #4) and the non-functioning cross-family review
+   (PR #5). Full Beta = build the remaining 5 tracks (mechanical).
+4. **L6 portfolio** — `research-portfolio` repo + `portfolio-synth.lobster` (the 7th workflow). Acceptance: an L6 cross-market brief, human-approved. **← NEXT** (OT + medical-device are now two real markets to synthesize across).
 5. **Engine release** — marketplace publish + `bump-engine` cross-instance version-propagation Action. Acceptance: a version bump propagates to instances via PR.
 (Optional/stretch: 5 deferred state hooks · `github-ops` + orchestrator sequence playbooks · WASM `factory-dispatcher` · autonomy 3.5.)
 
@@ -103,18 +108,29 @@ stays OFF (it echoes tool results incl. secrets into the log).
 ## Open items (not blockers)
 
 - ✅ **build-track iteration cap** — DONE (engine PR #1, `bee28fa`). See v1.0 list item 1.
-- **state-restore live re-validation:** engine PR #2 (`fbf2ffc`) fixed the asymmetric night-shift state loop
-  (restore-at-start added). NOT yet proven by a live instance run — the next `nightly-research` run should append
-  a Track build log entry to the instance `.factory/STATE.md` and advance `factory-artifacts` HEAD. Verify it.
+- ✅ **state-restore PROVEN live:** the first cold build on `medical-device-security` (regulatory-governance)
+  advanced `factory-artifacts` with a `### regulatory-governance — 2026-06-01` track-build-log entry. The
+  PR #2 (`fbf2ffc`) restore-at-start works end to end on a fresh instance.
+- ✅ **on-pr-review now actually reviews + comments** — engine PR #5. Was a no-op (Codex never got the diff;
+  no comment-posting). Now diff-scoped, posts findings as PR comments, scoped Perplexity MCP, audit artifacts.
+  Validated on a planted-error PR (both reviewers caught a false "HIPAA final" claim + an unsourced Type-2
+  claim; Gemini's Perplexity found the real figure). Resolves the old "0 comments" item.
 - **ingest.yml + weekly-maintenance.yml have NO state round-trip:** unlike nightly-research they have neither a
   restore nor a persist step, so they never record `.factory/` state at all. Give them the same symmetric
   restore+persist pair (follow-up to PR #2).
 - **cap value (6) is snug:** international-cohort converged at pass 5. A genuinely harder track needing 6–7 real
   revise passes would get prematurely flagged "did not converge." Revisit `max_passes` if false-flags appear;
   it's a per-market `factory.config` knob, so an instance can raise it.
-- **on-pr-review comment posting unverified:** reviewers run green but post 0 comments — likely because
-  build-track already converged the PR to 0 MUST-FIX; verify by running on-pr-review against a deliberately-
-  flawed PR.
+- **Codex reviewer's Perplexity MCP falls back to WebSearch:** Gemini's Perplexity MCP works (verified
+  citations live); Codex logs "MCP available but called via WebSearch/WebFetch fallback" — the inline
+  `codex-args` `mcp_servers` env propagation isn't landing the key. Codex still reviews well via fallback;
+  refine the Codex MCP env wiring as a follow-up (low priority — review works).
+- **state-manager CI commit mechanism:** the regulatory-governance state push carried the agent's commit
+  voice, so the agent may self-push `factory-artifacts` in CI despite the division-of-labor note (the
+  workflow's persist step should own it). Net result correct; confirm one canonical path.
+- **`pull_request` runs use the PR-HEAD-branch workflow** (not main) — so workflow fixes reach a market's
+  reviews on the NEXT build-track PR (branched from updated main), not retroactively on in-flight PRs. Keep
+  this in mind when shipping `on-pr-review`/Action changes.
 
 ## Decisions log
 
@@ -132,6 +148,14 @@ stays OFF (it echoes tool results incl. secrets into the log).
 - 2026-06-01: **also commit the cap fix to the engine on a feature branch → PR → squash-merge** (operator chose
   push-and-merge over hold-local); CI `test` gate must be green before merge.
 - 2026-06-01: **engine LICENSE = MIT** (operator choice — maximal adoption for a public marketplace others clone).
+- 2026-06-01: **market #2 = Healthcare & Medical-Device Security** (`1898andCo/medical-device-security-research`) —
+  closest cyber-physical sibling to OT; chosen for L6 portfolio value + distinct FDA/HDO/HTM vectors. Seed from a
+  Perplexity Sonar Deep Research landscape (47 sources).
+- 2026-06-01: **reviewers get scoped Perplexity MCP** (operator request) — verification-only (review-spec-fenced);
+  Gemini fetches/checks the cited source (P3). **No model is a black box** (operator rule): every model uploads its
+  full output as an artifact (Claude builder, Codex, Gemini).
+- 2026-06-01: **the workflow owns the factory-artifacts round-trip in CI**, and `pull_request` runs use the
+  PR-head-branch workflow — Action/review changes land on the NEXT build-track PR, not retroactively.
 
 ## How to resume (cold session, zero prior context)
 
