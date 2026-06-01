@@ -3,30 +3,42 @@
 **The one file to read to resume.** Authoritative, versioned, in-repo. Pairs with `BUILD-PLAN.md`
 (the design) and `git log` (the artifacts). My machine-local memory is only a pointer to this.
 
-Last updated: 2026-06-01.
+Last updated: 2026-06-01 (item-4 engine machinery DONE + portfolio repo stood up; first L6 run BLOCKED).
 
-## ▶ RESUME NEXT SESSION — start item 4: the L6 portfolio
+## ▶ RESUME NEXT SESSION — item 4 is 3/4 done; the first L6 run is BLOCKED on medical-device L4
 
-**v1.0 items #1–#3 are DONE** (cap, state-restore, cold-start prereqs, review-spec, working cross-family
-review, 2nd market proven cold). The public engine + template were org-scrubbed and made public; both
-market corpora stay private. **Pick up at v1.0 item #4 — the L6 cross-market portfolio.** There are now
-**two real markets** to synthesize across — `<your-org>/ot-ics-research` (OT/ICS) and
-`<your-org>/medical-device-security-research` (healthcare) — sharing vendors (Claroty/Armis/Forescout) and
-governance (CISA), so the L6 synthesis has genuine content.
+**Item 4 steps 1–3 are DONE this session; step 4 (the first L6 brief) is BLOCKED.** What landed:
+- ✅ **Step 1 — `portfolio-synth.lobster`** (the 7th workflow) + ✅ **step 2 — `L6-portfolio-synthesis.md`**
+  template, **+ `portfolio-rollup.yml` Action template + `templates/portfolio/manifest.yaml` + synthesizer
+  agent extended to L6**. Shipped in **engine PR #7 (merged `9ced663`)**. CI green; suite at 35 bats.
+  Workflows now **7/7**. (Real org is **`1898andCo`**; the engine text says `<your-org>` post-scrub.)
+- ✅ **Step 3 — `1898andCo/research-portfolio` CREATED** (PRIVATE) from the engine templates: `main` has
+  `portfolio/manifest.yaml` (registers `ot-ics` + `medical-device`) + `.github/workflows/portfolio-rollup.yml`
+  + `.github/mcp.json` + `.claude/settings.json` (engine plugin enabled) + READMEs; `factory-artifacts`
+  branch seeded with its own `STATE.md`. Local clone: `~/Dev/research-portfolio`.
+- ⛔ **Step 4 — BLOCKED.** A genuine OT × medical-device L6 needs **each** market's named L4/L5. **OT is
+  ready** (merged `corpus/synthesis/ot-security-l4-convergence-brief-v2.md` (L4) +
+  `…-v05-acceptance-judgment.md` (L5) on `main`). **medical-device is NOT:** its `main` has **no merged
+  corpus at all** — its `regulatory-governance` + `vendor-landscape` **L3** findings sit in **unmerged PRs
+  (#2, #3)**, and a single track cannot yield an L4 cross-track synthesis. So there is no medical-device
+  L4/L5 to synthesize. Running L6 now would either be OT-only (not cross-market) or reach into
+  medical-device's unmerged L3 (a layer-discipline violation). **STATE's old claim that market #2 was
+  "proven to adversary PASS" referred to a PR that was never human-merged.**
 
-**Concrete first steps for item 4** (design: BUILD-PLAN §3 L6, §6 repos, §9 `portfolio-synth.lobster` line 321,
-§12 `portfolio-rollup.yml` line 389; acceptance = one L6 cross-market brief, human-approved):
-1. **Build `portfolio-synth.lobster`** — the missing 7th workflow (engine `plugins/research-factory/workflows/`).
-   Shape: pull each registered instance's L4/L5 outputs → synthesizer (L6, cites named L4/L5 of each market) →
-   adversary review (capped) → **human-approval** → cross-market brief. L6 is cross-market *judgment* — always
-   human-gated. Validate with `lobster-parse validate`.
-2. **L6 doc template** — add `templates/corpus/L6-portfolio-synthesis.md` (observes L4/L5 across markets; cites
-   named market L4/L5; carries a market×vector roll-up). Mirror the L4 template's shape.
-3. **Create `<your-org>/research-portfolio`** (PRIVATE) from the template, with a manifest registering the two
-   instances. Install a `portfolio-rollup.yml` Action (`cron: 0 9 * * 1`) that runs `portfolio-synth` across
-   registered instances → L6 brief → human-gated PR. (`init-market` step 7 already says "register in portfolio".)
-4. **Run it** to produce the first L6 brief (OT × medical-device) → human-approved. That's the item-4 acceptance.
-   Then item #5 (engine marketplace publish + `bump-engine` propagation) closes v1.0.
+**To unblock step 4 (operator decision needed — see the 3 options I surfaced):**
+- **(A) Make medical-device L6-ready first:** review+merge its L3 PRs (#2,#3), build ≥1 more track, run the
+  L4 `cross-track-synth` → (optional L5) → then `portfolio-rollup` → first *real* L6 brief. Most faithful;
+  most paid effort.
+- **(B) Machinery-shakedown L6 now:** run `portfolio-rollup` with OT-only (or OT + an explicitly-flagged
+  "medical-device: no L4/L5 yet, absent" note) to prove the pipeline end-to-end — NOT the true cross-market
+  acceptance. Cheap; proves plumbing.
+- **(C) Defer the run** until medical-device matures.
+
+**Before any run:** set `1898andCo/research-portfolio` repo secrets — `ANTHROPIC_API_KEY`,
+`PERPLEXITY_API_KEY`, `TAVILY_API_KEY`, and **`INSTANCE_READ_TOKEN`** (fine-grained PAT or App token with
+**contents:read** on both instance repos — the rollup pulls private L4/L5 across the org boundary).
+
+Then item #5 (engine marketplace publish + `bump-engine` propagation) closes v1.0.
 
 Everything below is the durable detail. **Read this file top-to-bottom on a cold resume.**
 
@@ -65,7 +77,11 @@ state-manager recorded its run in the instance `.factory/STATE.md` track build l
    state-restore proven live; cross-family review validated. Also surfaced + fixed two cold-start gaps the OT
    instance had masked: the generic `docs/review-spec.md` (PR #4) and the non-functioning cross-family review
    (PR #5). Full Beta = build the remaining 5 tracks (mechanical).
-4. **L6 portfolio** — `research-portfolio` repo + `portfolio-synth.lobster` (the 7th workflow). Acceptance: an L6 cross-market brief, human-approved. **← NEXT** (OT + medical-device are now two real markets to synthesize across).
+4. **L6 portfolio** — engine machinery ✅ (engine PR #7, `9ced663`: `portfolio-synth.lobster` 7th workflow +
+   `L6-portfolio-synthesis.md` template + `portfolio-rollup.yml` + `templates/portfolio/manifest.yaml` +
+   synthesizer→L6). Portfolio repo ✅ (`1898andCo/research-portfolio`, private, stood up). **Acceptance
+   (first human-approved L6 brief) BLOCKED ← here:** medical-device has no merged L4/L5 (L3 in unmerged PRs).
+   See the RESUME block at top for the 3 unblock options + the required repo secrets.
 5. **Engine release** — marketplace publish + `bump-engine` cross-instance version-propagation Action. Acceptance: a version bump propagates to instances via PR.
 (Optional/stretch: 5 deferred state hooks · `github-ops` + orchestrator sequence playbooks · WASM `factory-dispatcher` · autonomy 3.5.)
 
@@ -101,6 +117,8 @@ The in-flight validation run completed **success** (51m34s; converged at adversa
 | `drbothen/research-factory` | the engine (this repo) | **public** (so instances clone the marketplace) |
 | `drbothen/research-factory-template` | thin instance starter (`gh repo create --template`) | **public** (org refs scrubbed + history collapsed first) |
 | `<your-org>/ot-ics-research` | instance #1 — OT/ICS, the **canonical** OT corpus | private |
+| `<your-org>/medical-device-security-research` | instance #2 — Healthcare & Medical-Device (cold market) | private |
+| `<your-org>/research-portfolio` | **L6 cross-market** portfolio (manifest + `portfolio-rollup`) — stood up this session | private |
 
 ## Deployment fixes baked into the Action templates (so the next market just works)
 
