@@ -39,7 +39,7 @@ Before any other action, say verbatim:
    - the seed: scope (what "done" looks like), source inventory, canonical values (the source-of-truth set)
    - editorial profile additions (forbidden phrases, per-track defaults)
 3. **Write** `factory.config.yaml` (from `${CLAUDE_PLUGIN_ROOT}/templates/factory.config.template.yaml`) and `seed/{scope.md,sources.md,canonical-values.md}`. Validate: `${CLAUDE_PLUGIN_ROOT}/bin/factory-config.sh validate factory.config.yaml`.
-4. **Install the Action templates** from `${CLAUDE_PLUGIN_ROOT}/templates/github-action-templates/*.yml` into the instance's `.github/workflows/`. Leave schedules defined but expect the first runs to be human-reviewed.
+4. **Install the Action templates** from `${CLAUDE_PLUGIN_ROOT}/templates/github-action-templates/*.yml` into the instance's `.github/workflows/`, and the **adversary review spec** from `${CLAUDE_PLUGIN_ROOT}/templates/instance-docs/review-spec.md` into the instance's `docs/review-spec.md` (the `on-pr-review` Codex step reads it as its `prompt-file` — a cold market without it fails the cross-family review). The `research-factory-template` repo already ships both. Leave schedules defined but expect the first runs to be human-reviewed.
 5. **Enable the engine plugin** for the instance (`.claude/settings.json` → `enabledPlugins: {"research-factory@research-factory": true}`).
 6. **Initialize `.factory/`** — write `STATE.md` (phase, decisions log) on the factory-artifacts branch/worktree.
 7. **Register in the portfolio** — add the market to `research-portfolio`'s manifest so L6 rollups include it.
