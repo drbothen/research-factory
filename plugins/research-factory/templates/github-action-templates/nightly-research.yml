@@ -50,12 +50,21 @@ jobs:
             --allowedTools "mcp__perplexity__*,mcp__tavily__*,Read,Write,Edit,MultiEdit,Bash,Glob,Grep,Task,WebFetch,WebSearch"
           prompt: |
             Run the research-factory build-track skill on ${{ github.event.inputs.track || 'the next open work-item in WORK-BACKLOG / STATE.md' }}.
-            Draft/advance → editorial-sweep → citation-verify → adversary loop to PASS → state-manager.
-            When the loop reaches an adversary PASS, COMMIT the changes to a new branch named
-            claude/<track>-<short-desc>, push it, then OPEN A PR with:
-              gh pr create --base main --head <that-branch> --title "Night shift: <track>" --body "<short summary + 'Human merges (autonomy 3)'>"
+            Draft/advance → editorial-sweep → citation-verify → adversary loop (capped) → state-manager.
+            The adversary loop is HARD-CAPPED at convergence.max_passes (default 6): loop to an
+            adversary PASS, OR stop at the cap if a stubborn draft will not converge — never grind
+            unbounded (that runaway burns the whole job timeout and commits nothing).
+            COMMIT the changes either way, to a new branch named claude/<track>-<short-desc>, push it,
+            then OPEN A PR:
+              - Converged (PASS, 0 MUST-FIX):
+                  gh pr create --base main --head <branch> --title "Night shift: <track>" \
+                    --body "<short summary + 'Human merges (autonomy 3)'>"
+              - Capped exit (cap hit, M MUST-FIX remain): commit what you have and FLAG it —
+                  gh pr create --base main --head <branch> \
+                    --title "Night shift: <track> [DID NOT CONVERGE: M MUST-FIX]" \
+                    --body "<summary> · Adversary loop hit max_passes (N) with M MUST-FIX remaining. NOT converged — review the remaining MUST-FIX before merge. Human merges (autonomy 3)."
             Do NOT merge. If you make NO changes, say so explicitly and open no PR/branch.
-            Surface anything needing human judgment.
+            Surface anything needing human judgment, and always state the convergence outcome.
           # show_full_output left OFF — it can echo tool results (incl. secrets) into the run log.
           # The full conversation is captured the safe way: the claude-execution-log artifact below.
 
@@ -119,7 +128,11 @@ jobs:
             echo "PR already open for $BR (Claude opened it via the App token)."
             exit 0
           fi
+          # Safety-net body stays neutral on convergence: this step can't read the loop outcome.
+          # If Claude converged it normally opens its own (better-titled) PR via the App token;
+          # this fallback only fires when that didn't happen, so do NOT assert "adversary PASS" —
+          # the convergence outcome (PASS or capped exit) is in the conversation log.
           gh pr create --repo "${{ github.repository }}" --head "$BR" --base main \
-            --title "Night shift: ${TRACK:-work-item}" \
-            --body "Automated build-track run (adversary PASS). Human merges — autonomy 3. Conversation log: artifact claude-execution-log-${{ github.run_id }}." \
+            --title "Night shift: ${TRACK:-work-item} [check convergence]" \
+            --body "Automated build-track run (fallback PR — Claude did not open its own). Convergence outcome (PASS or capped exit with remaining MUST-FIX) is in the conversation log; review before merge. Human merges — autonomy 3. Log: artifact claude-execution-log-${{ github.run_id }}." \
             || echo "PR may already exist for $BR"

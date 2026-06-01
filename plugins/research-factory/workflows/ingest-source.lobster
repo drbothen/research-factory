@@ -46,6 +46,8 @@ steps:
     convergence:
       novelty_threshold: 0.15
       clean_passes_required: 3
+      max_passes: 6            # hard cap; default mirrors factory.config convergence.max_passes
+      on_cap: commit-flagged   # cap hit without convergence → still commit, but flag the PR
     context:
       exclude: [prior-review-passes, drafter-reasoning]
 
