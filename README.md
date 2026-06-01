@@ -6,6 +6,9 @@ product-management deliverables. Domain-agnostic: a new market is a new **config
 
 See [`BUILD-PLAN.md`](./BUILD-PLAN.md) for the full design (self-contained; read top to bottom).
 
+> **▶ Resuming / picking up?** The live build state (current phase, what's left, how to resume) is **`STATE.md` on the orphan `factory-artifacts` branch** (not on `main`). Read it first:
+> `git show origin/factory-artifacts:STATE.md` — or mount it: `git fetch origin factory-artifacts && git worktree add .factory factory-artifacts`.
+
 ## Status
 
 - [x] **P0** — secrets hygiene; 3 vendor keys provisioned + validated (hello-world Action green)
