@@ -8,9 +8,14 @@ Last updated: 2026-06-01.
 ## Current phase
 
 **v1.0 IN PROGRESS.** Done: item 1 (`build-track` iteration cap, engine PR #1) + state-loop restore fix
-(engine PR #2) + item 2 (cold-start prerequisites, engine PR #3). **NEXT: item 3 — 2nd market cold via
-`/init-market`** (the real "config + seed, not code" proof; acceptance = 2nd market → Beta from a cold seed).
-Remaining v1.0: L6 portfolio · engine marketplace publish + `bump-engine` propagation.
+(engine PR #2) + item 2 (cold-start prerequisites, engine PR #3). **Item 3 — 2nd market — SCAFFOLDED:**
+`1898andCo/medical-device-security-research` created cold via the init-market procedure (config + seed +
+state + workflows). **Remaining for item-3 acceptance: set instance secrets + org App, then prove ONE
+track to adversary PASS** (then Beta). Remaining v1.0: L6 portfolio · marketplace publish + `bump-engine`.
+
+> **Template repo was refreshed first** (`drbothen/research-factory-template`): its 4 workflows had drifted
+> behind the engine (missing v0.8 hardening + the v1.0 cap/state-restore fixes); also added `.github/mcp.json`
+> + `.factory/` gitignore. Manual stand-in for the not-yet-built `bump-engine` propagation (item #5).
 
 > Note: "engine PR #1/#2" = PRs on `drbothen/research-factory` (the engine). Distinct from instance
 > `1898andCo/ot-ics-research` PRs (its PR #1 federal-dod-buyer, PR #2 international-cohort).
