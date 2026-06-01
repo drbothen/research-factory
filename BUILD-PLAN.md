@@ -457,7 +457,7 @@ Every first-class component (the 7 workflows §9, 12 agents §8, 4 repos §6, th
   Deferred, state-dependent, documented in `docs/HOOKS.md`: `source-faithfulness-guard`, `anchor-not-strip-guard`,
   `convergence-tracker`, `protect-canonical`, `factory-branch-guard`.
 - **Agents — 11 of 12** (missing `github-ops`; `orchestrator` is a single agent, no `orchestrator/*-sequence` playbooks).
-- **Workflows — 6 of 7** (missing `portfolio-synth.lobster` — it is v1.0/L6).
+- **Workflows — 7 of 7** (`portfolio-synth.lobster` shipped — the v1.0/L6 cross-market rollup, human-gated).
 - **Templates:** `templates/corpus/` (generic L2/L3/summary/L4 doc templates for *new* markets) not shipped — the OT instance uses its migrated patterns.
 - **Docs/dirs:** have FACTORY-SOUL · LAYER-MODEL · AUTONOMY · HOOKS; missing `docs/FACTORY.md` (engine orientation) + `CONVERGENCE.md`; `data/` and `checklists/` unused (the review spec lives in the instance as `docs/review-spec.md`); engine `LICENSE` + `CLAUDE.md` not added.
 - **State model (§11):** ✅ `.factory/` now on the orphan `factory-artifacts` branch (mounted as a worktree, gitignored on `main`) — engine + instance. Still deferred: INDEX+detail sharding, STATE.md size-cap hook.

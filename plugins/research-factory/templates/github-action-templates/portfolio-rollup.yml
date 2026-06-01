@@ -1,0 +1,172 @@
+# portfolio-rollup.yml — the L6 cross-market rollup (installed into the PORTFOLIO repo's
+# .github/workflows/, NOT into an instance). Once a week Claude (the builder) pulls each registered
+# instance's named L4/L5 outputs (per portfolio/manifest.yaml), runs the portfolio-synth workflow to
+# draft the L6 cross-market brief, and opens a PR. L6 is cross-market judgment → it is ALWAYS
+# human-gated: this Action NEVER auto-merges (claude-code-action returns a branch + PR link; you
+# merge). Mirrors nightly-research.yml's shape (restore/persist .factory, App token, audit log).
+#
+# Cross-repo reads: the instance repos are private and in a different org than this token's repo, so
+# GITHUB_TOKEN cannot read them. Provide INSTANCE_READ_TOKEN — a fine-grained PAT (or the GitHub App
+# installation token) with contents:read on every registered instance repo — as a repo/org secret.
+name: portfolio-rollup
+on:
+  schedule:
+    - cron: "0 9 * * 1"      # Monday 09:00 UTC — after the markets' nightly/weekly runs have landed
+  workflow_dispatch:
+    inputs:
+      window:
+        description: "Rollup window label (optional; default = manifest 'window')"
+        required: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write           # required by claude-code-action (OIDC)
+
+jobs:
+  rollup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120      # bounded — one cross-market synthesis over named L4/L5, not the corpora
+    steps:
+      - uses: actions/checkout@v4
+
+      # Restore prior portfolio pipeline state (.factory/) from the orphan factory-artifacts branch
+      # BEFORE the builder runs, so the state-manager appends to the REAL portfolio build log instead
+      # of an empty workspace (§11). Mirror of "Persist pipeline state" at the end.
+      - name: Restore pipeline state from factory-artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git fetch origin factory-artifacts 2>/dev/null || true
+          if git show-ref --verify --quiet refs/remotes/origin/factory-artifacts; then
+            mkdir -p .factory
+            git archive origin/factory-artifacts | tar -x -C .factory
+            echo "Restored .factory/ from factory-artifacts:"; ls -A .factory
+          else
+            echo "no factory-artifacts branch yet — first run; the state-manager will create .factory/STATE.md"
+          fi
+
+      # Pull each registered instance's NAMED L4/L5 docs into instance-outputs/<slug>/ (manifest-driven).
+      # Blobless shallow clone of each instance, then copy ONLY the files matching the manifest globs —
+      # never the whole corpus, never below L4/L5 (the cross-market layer-discipline boundary).
+      - name: Pull instance L4/L5 outputs (per manifest)
+        env:
+          INSTANCE_READ_TOKEN: ${{ secrets.INSTANCE_READ_TOKEN }}
+        run: |
+          set -euo pipefail
+          command -v yq >/dev/null || { echo "::error::yq (mikefarah v4) required"; exit 1; }
+          rm -rf instance-outputs && mkdir -p instance-outputs
+          n=$(yq '.instances | length' portfolio/manifest.yaml)
+          for i in $(seq 0 $((n-1))); do
+            slug=$(yq -r ".instances[$i].slug" portfolio/manifest.yaml)
+            repo=$(yq -r ".instances[$i].repo" portfolio/manifest.yaml)
+            echo "::group::$slug ($repo)"
+            tmp="$(mktemp -d)"
+            git clone --filter=blob:none --depth 1 \
+              "https://x-access-token:${INSTANCE_READ_TOKEN}@github.com/${repo}.git" "$tmp" 2>&1 | tail -1
+            dest="instance-outputs/${slug}"; mkdir -p "$dest"
+            # copy files matching each L4 + L5 glob, preserving relative paths
+            for layer in l4 l5; do
+              m=$(yq ".instances[$i].${layer} | length // 0" portfolio/manifest.yaml)
+              for j in $(seq 0 $((m-1))); do
+                pat=$(yq -r ".instances[$i].${layer}[$j]" portfolio/manifest.yaml)
+                ( cd "$tmp" && find . -type f -path "./$pat" 2>/dev/null ) | while read -r f; do
+                  rel="${f#./}"; mkdir -p "$dest/$(dirname "$rel")"; cp "$tmp/$rel" "$dest/$rel"
+                done
+              done
+            done
+            echo "pulled into $dest:"; find "$dest" -type f | sed 's/^/  /' || echo "  (none matched — check manifest globs)"
+            rm -rf "$tmp"
+            echo "::endgroup::"
+          done
+          echo "Instance outputs assembled under instance-outputs/."
+
+      - name: Claude builder — draft the L6 cross-market brief (portfolio-synth)
+        id: claude
+        uses: anthropics/claude-code-action@v1
+        env:
+          PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # NO github_token override → use the Claude GitHub App token (workflows:write; triggers
+          # on-pr-review; can push .github/** ranges). See nightly-research.yml for the rationale.
+          plugin_marketplaces: |
+            https://github.com/drbothen/research-factory.git
+          plugins: |
+            research-factory@research-factory
+          claude_args: >-
+            --model claude-sonnet-4-6
+            --mcp-config .github/mcp.json
+            --allowedTools "mcp__perplexity__*,mcp__tavily__*,Read,Write,Edit,MultiEdit,Bash,Glob,Grep,Task,WebFetch,WebSearch"
+          prompt: |
+            Run the research-factory portfolio-synth workflow to draft the L6 cross-market portfolio brief.
+            Inputs: the registered instances' named L4/L5 docs are already pulled into instance-outputs/<slug>/.
+            Read ONLY those (index/summary level) — do NOT reach into any market's L3/L2/L1, and do NOT
+            re-derive a market's findings (cross-market layer discipline).
+            Synthesize → editorial-sweep → consistency-check → adversary loop (HARD-CAPPED at
+            convergence.max_passes, default 6: loop to a PASS, or stop at the cap — never grind unbounded).
+            Write the L6 brief from templates/corpus/L6-portfolio-synthesis.md: every cross-market
+            observation cites the NAMED market L4/L5 it rests on; any cross-market judgment is LABELLED
+            as judgment; include the market×vector roll-up.
+            COMMIT to a new branch claude/portfolio-rollup-<window>, push it, then OPEN A PR:
+              - Converged (PASS, 0 MUST-FIX):
+                  gh pr create --base main --head <branch> --title "Portfolio rollup: L6 (<window>)" \
+                    --body "<summary> · L6 cross-market brief. L6 is cross-market judgment — human approves & merges."
+              - Capped exit (M MUST-FIX remain): commit what you have and FLAG it —
+                  gh pr create --base main --head <branch> \
+                    --title "Portfolio rollup: L6 (<window>) [DID NOT CONVERGE: M MUST-FIX]" \
+                    --body "<summary> · Adversary loop hit max_passes (N) with M MUST-FIX remaining. NOT converged — review before approving. Human approves & merges."
+            Do NOT merge — L6 is ALWAYS human-gated. If no instance outputs were found, say so and open no PR.
+
+      - name: Upload Claude execution log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: claude-execution-log-${{ github.run_id }}
+          path: ${{ steps.claude.outputs.execution_file }}
+          if-no-files-found: warn
+          retention-days: 30
+
+      # Persist portfolio pipeline state (.factory/) to the orphan factory-artifacts branch (§11).
+      - name: Persist pipeline state to factory-artifacts
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          { [ -d .factory ] && [ -n "$(ls -A .factory 2>/dev/null)" ]; } || { echo "no .factory state written this run"; exit 0; }
+          git fetch origin factory-artifacts 2>/dev/null || true
+          wt="$(mktemp -d)"
+          if git show-ref --verify --quiet refs/remotes/origin/factory-artifacts; then
+            git worktree add -q "$wt" origin/factory-artifacts
+          else
+            git worktree add -q --orphan -b factory-artifacts "$wt"
+          fi
+          cp -R .factory/. "$wt"/
+          ( cd "$wt"
+            git add -A
+            git -c user.name="claude[bot]" -c user.email="claude[bot]@users.noreply.github.com" \
+              commit -m "state: portfolio rollup (run ${{ github.run_id }})" \
+              && git push origin HEAD:factory-artifacts || echo "no state change to push" )
+
+      # Fallback PR opener — detect the branch Claude pushed (branch_name output is empty for Bash
+      # pushes) and ensure a human-gated PR exists. Neutral on convergence (this step can't read it).
+      - name: Ensure a PR exists for Claude's branch
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BR=$(git ls-remote --heads origin "refs/heads/claude/portfolio-rollup*" | sed 's|.*refs/heads/||' | sort | tail -1)
+          if [ -z "$BR" ]; then
+            echo "No claude/portfolio-rollup* branch on remote — Claude made no committable change, or the push failed."
+            exit 0
+          fi
+          echo "Detected pushed branch: $BR"
+          if [ -n "$(gh pr list --repo "${{ github.repository }}" --head "$BR" --json number -q '.[0].number')" ]; then
+            echo "PR already open for $BR (Claude opened it via the App token)."
+            exit 0
+          fi
+          gh pr create --repo "${{ github.repository }}" --head "$BR" --base main \
+            --title "Portfolio rollup: L6 [check convergence]" \
+            --body "Automated portfolio-synth run (fallback PR — Claude did not open its own). L6 is cross-market judgment — human approves & merges (never auto-merge). Convergence outcome is in the conversation log: artifact claude-execution-log-${{ github.run_id }}." \
+            || echo "PR may already exist for $BR"

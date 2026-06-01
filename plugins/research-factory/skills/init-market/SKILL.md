@@ -42,7 +42,11 @@ Before any other action, say verbatim:
 4. **Install the Action templates** from `${CLAUDE_PLUGIN_ROOT}/templates/github-action-templates/*.yml` into the instance's `.github/workflows/`, and the **adversary review spec** from `${CLAUDE_PLUGIN_ROOT}/templates/instance-docs/review-spec.md` into the instance's `docs/review-spec.md` (the `on-pr-review` Codex step reads it as its `prompt-file` — a cold market without it fails the cross-family review). The `research-factory-template` repo already ships both. Leave schedules defined but expect the first runs to be human-reviewed.
 5. **Enable the engine plugin** for the instance (`.claude/settings.json` → `enabledPlugins: {"research-factory@research-factory": true}`).
 6. **Initialize `.factory/`** — write `STATE.md` (phase, decisions log) on the factory-artifacts branch/worktree.
-7. **Register in the portfolio** — add the market to `research-portfolio`'s manifest so L6 rollups include it.
+7. **Register in the portfolio** — append the market to `research-portfolio`'s `portfolio/manifest.yaml`
+   (an `instances:` entry: `slug`, `repo`, and the globs for its named L4/L5 docs) so the weekly
+   `portfolio-rollup` L6 synthesis includes it. The manifest format ships at
+   `${CLAUDE_PLUGIN_ROOT}/templates/portfolio/manifest.yaml`; the rollup Action at
+   `${CLAUDE_PLUGIN_ROOT}/templates/github-action-templates/portfolio-rollup.yml`.
 8. **Prove one track by hand** before enabling autonomy: run `build-track` on a single track to an adversary PASS — its doc set scaffolds from `${CLAUDE_PLUGIN_ROOT}/templates/corpus/` (the generic L2/L3/summary/L4 skeletons; a cold market has nothing of its own to copy). Only then turn the cron schedules on. Start at `autonomy_level: 3`.
 
 ## Reference

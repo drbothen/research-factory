@@ -7,12 +7,25 @@ WF="${BATS_TEST_DIRNAME}/../workflows"
 setup() { TMP="$(mktemp -d)"; }
 teardown() { rm -rf "$TMP"; }
 
-@test "all 5 shipped workflows validate" {
-  for f in build-track cross-track-synth ingest-source judgment maintenance; do
-    run python3 "$PARSE" validate "$WF/$f.lobster"
+@test "every shipped workflow validates" {
+  shopt -s nullglob
+  local found=0
+  for f in "$WF"/*.lobster; do
+    found=$((found+1))
+    run python3 "$PARSE" validate "$f"
     [ "$status" -eq 0 ] || { echo "FAILED: $f -> $output"; return 1; }
     [[ "$output" == *"PASS"* ]]
   done
+  # guard against an empty glob silently passing
+  [ "$found" -ge 7 ] || { echo "expected >= 7 workflows, found $found"; return 1; }
+}
+
+@test "portfolio-synth (L6) is human-gated and ends at the state-manager commit" {
+  run python3 "$PARSE" order "$WF/portfolio-synth.lobster"
+  [ "$status" -eq 0 ]
+  # the cross-market judgment layer must pass through human-approval before commit, and commit is last
+  [[ "$output" == *"human-approval"* ]]
+  [ "${lines[${#lines[@]}-1]}" = "commit" ]
 }
 
 @test "order is topological (a dependency precedes its dependent)" {
