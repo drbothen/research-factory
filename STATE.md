@@ -74,7 +74,7 @@ The in-flight validation run completed **success** (51m34s; converged at adversa
 | Repo | Role | Visibility |
 |---|---|---|
 | `drbothen/research-factory` | the engine (this repo) | **public** (so instances clone the marketplace) |
-| `drbothen/research-factory-template` | thin instance starter (`gh repo create --template`) | private |
+| `drbothen/research-factory-template` | thin instance starter (`gh repo create --template`) | **public** (org refs scrubbed + history collapsed first) |
 | `<your-org>/ot-ics-research` | instance #1 — OT/ICS, the **canonical** OT corpus | private |
 
 ## Deployment fixes baked into the Action templates (so the next market just works)
@@ -131,6 +131,15 @@ stays OFF (it echoes tool results incl. secrets into the log).
 - **`pull_request` runs use the PR-HEAD-branch workflow** (not main) — so workflow fixes reach a market's
   reviews on the NEXT build-track PR (branched from updated main), not retroactively on in-flight PRs. Keep
   this in mind when shipping `on-pr-review`/Action changes.
+- **engine `factory-artifacts` HISTORY still holds removed org content:** the init-market staging + healthcare
+  research were removed from HEAD (and STATE.md org refs genericized), but the engine repo is public and the
+  removal was HEAD-only — the content is still reachable in branch history (commits `5e2d743`, `3874cea`, …).
+  To FULLY purge, rewrite factory-artifacts history (filter-repo on `specs/init-market` + `specs/research`,
+  force-push) — outward/destructive, needs an explicit OK. Also: STATE.md still narrates market-#2 detail
+  (regulatory triad, incidents) in prose — public-fact, but redact further if full market-neutrality is wanted.
+- **company-specific forbidden phrases moved out of the engine hook (P10):** `forbidden-phrase-guard.sh` now
+  carries only generic positioning patterns; market-specific company names belong in each instance's
+  `editorial.forbidden_phrases_extra`. Add them to the OT + medical-device instance configs to restore that catch.
 
 ## Decisions log
 
