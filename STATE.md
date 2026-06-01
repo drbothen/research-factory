@@ -9,7 +9,7 @@ Last updated: 2026-06-01.
 
 **v1.0 IN PROGRESS.** Done: item 1 (cap, engine PR #1) + state-restore (PR #2) + item 2 (cold-start, PR #3)
 + review-spec (PR #4) + cross-family-review-actually-reviews (PR #5). **Item 3 — 2nd market — PROVEN:**
-`1898andCo/medical-device-security-research` created cold; `regulatory-governance` driven to **adversary
+`<your-org>/medical-device-security-research` created cold; `regulatory-governance` driven to **adversary
 PASS** from the cold seed (the "config + seed, not code" thesis, with ZERO engine code); state-restore
 proven live; cross-family review (Codex+Gemini) validated catching planted errors. Remaining for full Beta:
 build the other 5 tracks (mechanical, autonomy 3). Remaining v1.0: **item 4 L6 portfolio · item 5 release**.
@@ -19,7 +19,7 @@ build the other 5 tracks (mechanical, autonomy 3). Remaining v1.0: **item 4 L6 p
 > + `.factory/` gitignore. Manual stand-in for the not-yet-built `bump-engine` propagation (item #5).
 
 > Note: "engine PR #1/#2" = PRs on `drbothen/research-factory` (the engine). Distinct from instance
-> `1898andCo/ot-ics-research` PRs (its PR #1 federal-dod-buyer, PR #2 international-cohort).
+> `<your-org>/ot-ics-research` PRs (its PR #1 federal-dod-buyer, PR #2 international-cohort).
 
 Also notable: **PR #1 was human-merged** — federal-dod-buyer night-shift work is now `status/active` on the
 instance `main` (the autonomy-3 human-merge step, closing the full v0.8 loop end to end), and the night-shift
@@ -66,7 +66,7 @@ The in-flight validation run completed **success** (51m34s; converged at adversa
 | v0.1 — engine skeleton + OT instance | ✅ done | require-citation hook proven headless; build-track → adversary PASS on one track; config loader |
 | v0.5 — L1→L5 pipeline | ✅ done | L3→L4 synth → adversary PASS; L5 judgment through human gate (REVISE×3→PASS); 34 bats green |
 | v0.8 — Actions autonomy + /init-market | ✅ done | live night-shift run → **PR #1** (real fixes, autonomy 3); Codex+Gemini review green; /init-market throwaway scaffold |
-| v0.9 — PM pipeline | ✅ done | OT operationalization-gap finding → concept + 7-section PRD + 7-field stories; Dev-Readiness Check ran (2 CLEAR, 5 flagged as labeled Assumptions/Open-Questions, no invention) → `1898andCo/ot-ics-research/pm/operationalization-gap/` |
+| v0.9 — PM pipeline | ✅ done | OT operationalization-gap finding → concept + 7-section PRD + 7-field stories; Dev-Readiness Check ran (2 CLEAR, 5 flagged as labeled Assumptions/Open-Questions, no invention) → `<your-org>/ot-ics-research/pm/operationalization-gap/` |
 | v1.0 — portfolio (L6) + 2nd market + marketplace publish | ⬜ | 2nd market to Beta from cold seed; L6 brief; engine version-bump propagation |
 
 ## Repos
@@ -75,7 +75,7 @@ The in-flight validation run completed **success** (51m34s; converged at adversa
 |---|---|---|
 | `drbothen/research-factory` | the engine (this repo) | **public** (so instances clone the marketplace) |
 | `drbothen/research-factory-template` | thin instance starter (`gh repo create --template`) | private |
-| `1898andCo/ot-ics-research` | instance #1 — OT/ICS, the **canonical** OT corpus | private |
+| `<your-org>/ot-ics-research` | instance #1 — OT/ICS, the **canonical** OT corpus | private |
 
 ## Deployment fixes baked into the Action templates (so the next market just works)
 
@@ -134,7 +134,7 @@ stays OFF (it echoes tool results incl. secrets into the log).
 
 ## Decisions log
 
-- 2026-05-31: `1898andCo/ot-ics-research` is the **canonical** OT corpus (cutover; old ai-knowledge-base →
+- 2026-05-31: `<your-org>/ot-ics-research` is the **canonical** OT corpus (cutover; old ai-knowledge-base →
   ot-security-research mirror chain is legacy).
 - 2026-05-31: engine repo made **public**; secret fragment scrubbed from history before publishing.
 - 2026-05-31: **researcher prefers MCP search** (Perplexity/Tavily), built-in WebSearch/WebFetch fallback.
@@ -148,7 +148,7 @@ stays OFF (it echoes tool results incl. secrets into the log).
 - 2026-06-01: **also commit the cap fix to the engine on a feature branch → PR → squash-merge** (operator chose
   push-and-merge over hold-local); CI `test` gate must be green before merge.
 - 2026-06-01: **engine LICENSE = MIT** (operator choice — maximal adoption for a public marketplace others clone).
-- 2026-06-01: **market #2 = Healthcare & Medical-Device Security** (`1898andCo/medical-device-security-research`) —
+- 2026-06-01: **market #2 = Healthcare & Medical-Device Security** (`<your-org>/medical-device-security-research`) —
   closest cyber-physical sibling to OT; chosen for L6 portfolio value + distinct FDA/HDO/HTM vectors. Seed from a
   Perplexity Sonar Deep Research landscape (47 sources).
 - 2026-06-01: **reviewers get scoped Perplexity MCP** (operator request) — verification-only (review-spec-fenced);
@@ -163,8 +163,8 @@ stays OFF (it echoes tool results incl. secrets into the log).
 see it. Get it with: `git fetch origin factory-artifacts && git worktree add .factory factory-artifacts`
 (or read once: `git show origin/factory-artifacts:STATE.md`). The engine README + BUILD-PLAN §18 on `main` point here.
 
-1. **Repos** (clone all three): `drbothen/research-factory` (engine, public), `drbothen/research-factory-template` (private), `1898andCo/ot-ics-research` (instance, private). Local clones on this machine: `~/Dev/research-factory`, `~/Dev/ot-ics-research`. `gh` is authed as **drbothen** (admin on 1898andCo).
+1. **Repos** (clone all three): `drbothen/research-factory` (engine, public), `drbothen/research-factory-template` (private), `<your-org>/ot-ics-research` (instance, private). Local clones on this machine: `~/Dev/research-factory`, `~/Dev/ot-ics-research`. `gh` is authed as **drbothen** (admin on <your-org>).
 2. **Read:** this file (full), then `BUILD-PLAN.md` §1 (constitution), §15+§15.1 (roadmap + status/delta), §18 (bootstrap). `CHANGELOG.md` for per-phase deltas.
-3. **Verify the live proof:** `gh pr view 1 --repo 1898andCo/ot-ics-research` (merged night-shift PR); `git log --oneline` in each repo.
+3. **Verify the live proof:** `gh pr view 1 --repo <your-org>/ot-ics-research` (merged night-shift PR); `git log --oneline` in each repo.
 4. **First action on resume:** check the in-flight run above (`26732442937`). Then pick up at **What's left to v1.0** — start with the `build-track` iteration cap.
 5. Secrets are set on the instance (ANTHROPIC/OPENAI/GEMINI/PERPLEXITY/TAVILY) + engine; never re-commit them.
