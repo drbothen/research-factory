@@ -14,6 +14,19 @@ Also notable: **PR #1 was human-merged** — federal-dod-buyer night-shift work 
 instance `main` (the autonomy-3 human-merge step, closing the full v0.8 loop end to end), and the night-shift
 state-manager recorded its run in the instance `.factory/STATE.md` track build log.
 
+### What's left to v1.0 (recommended order)
+
+1. **`build-track` iteration cap** — the load-bearing fix (see Open items). Do FIRST; de-risks unattended scale.
+2. **Cold-start prerequisites:** ship `templates/corpus/` (generic L2/L3/summary/L4 doc templates — a cold 2nd market has nothing to copy) + engine `LICENSE` + engine `CLAUDE.md` (+ `docs/FACTORY.md`) — needed before publish.
+3. **2nd market cold via `/init-market`** — the real proof of "config + seed, not code". Acceptance: 2nd market → Beta from a cold seed.
+4. **L6 portfolio** — `research-portfolio` repo + `portfolio-synth.lobster` (the 7th workflow). Acceptance: an L6 cross-market brief, human-approved.
+5. **Engine release** — marketplace publish + `bump-engine` cross-instance version-propagation Action. Acceptance: a version bump propagates to instances via PR.
+(Optional/stretch: 5 deferred state hooks · `github-ops` + orchestrator sequence playbooks · WASM `factory-dispatcher` · autonomy 3.5.)
+
+### In-flight at last context clear (2026-05-31)
+
+- **Validation run** of the `factory-artifacts` state-push: `nightly-research` run `26732442937` on `international-cohort` (instance) was `in_progress`. CHECK IT FIRST on resume: `gh run view 26732442937 --repo 1898andCo/ot-ics-research`. Verifying: (a) `claude/international-cohort*` branch + PR opened, (b) `.factory/STATE.md` pushed to `factory-artifacts` (compare HEAD vs `937a1f6` — the pre-run SHA), (c) STATE.md history preserved not clobbered (the state-manager writes a fresh STATE.md in CI since `.factory` is gitignored on `main` — if it clobbers the track log, the run will show it; fix = fetch `factory-artifacts` STATE at build start).
+
 ## Roadmap status (BUILD-PLAN §15)
 
 | Phase | Status | Acceptance evidence |
@@ -78,8 +91,14 @@ stays OFF (it echoes tool results incl. secrets into the log).
 - 2026-05-31: **researcher prefers MCP search** (Perplexity/Tavily), built-in WebSearch/WebFetch fallback.
 - 2026-05-31: **never cancel an in-flight paid run without asking** (operator rule).
 
-## How to resume
+## How to resume (cold session, zero prior context)
 
-1. Read this file + `BUILD-PLAN.md` §15 (roadmap) and §1 (constitution).
-2. `git log --oneline` here for the artifact trail; `gh pr view 1 --repo 1898andCo/ot-ics-research` for the live proof.
-3. Pick up at the **Current phase** above. For v0.9, see BUILD-PLAN §4 (PM pipeline) + §9 (`pm-doc-chain.lobster`).
+**This file lives on the orphan `factory-artifacts` branch — it is NOT on `main`.** A fresh `main` clone won't
+see it. Get it with: `git fetch origin factory-artifacts && git worktree add .factory factory-artifacts`
+(or read once: `git show origin/factory-artifacts:STATE.md`). The engine README + BUILD-PLAN §18 on `main` point here.
+
+1. **Repos** (clone all three): `drbothen/research-factory` (engine, public), `drbothen/research-factory-template` (private), `1898andCo/ot-ics-research` (instance, private). Local clones on this machine: `~/Dev/research-factory`, `~/Dev/ot-ics-research`. `gh` is authed as **drbothen** (admin on 1898andCo).
+2. **Read:** this file (full), then `BUILD-PLAN.md` §1 (constitution), §15+§15.1 (roadmap + status/delta), §18 (bootstrap). `CHANGELOG.md` for per-phase deltas.
+3. **Verify the live proof:** `gh pr view 1 --repo 1898andCo/ot-ics-research` (merged night-shift PR); `git log --oneline` in each repo.
+4. **First action on resume:** check the in-flight run above (`26732442937`). Then pick up at **What's left to v1.0** — start with the `build-track` iteration cap.
+5. Secrets are set on the instance (ANTHROPIC/OPENAI/GEMINI/PERPLEXITY/TAVILY) + engine; never re-commit them.
