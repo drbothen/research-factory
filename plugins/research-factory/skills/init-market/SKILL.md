@@ -43,7 +43,7 @@ Before any other action, say verbatim:
 5. **Enable the engine plugin** for the instance (`.claude/settings.json` → `enabledPlugins: {"research-factory@research-factory": true}`).
 6. **Initialize `.factory/`** — write `STATE.md` (phase, decisions log) on the factory-artifacts branch/worktree.
 7. **Register in the portfolio** — add the market to `research-portfolio`'s manifest so L6 rollups include it.
-8. **Prove one track by hand** before enabling autonomy: run `build-track` on a single track to an adversary PASS. Only then turn the cron schedules on. Start at `autonomy_level: 3`.
+8. **Prove one track by hand** before enabling autonomy: run `build-track` on a single track to an adversary PASS — its doc set scaffolds from `${CLAUDE_PLUGIN_ROOT}/templates/corpus/` (the generic L2/L3/summary/L4 skeletons; a cold market has nothing of its own to copy). Only then turn the cron schedules on. Start at `autonomy_level: 3`.
 
 ## Reference
 
