@@ -8,9 +8,9 @@ Last updated: 2026-06-01.
 ## Current phase
 
 **v1.0 IN PROGRESS.** Done: item 1 (`build-track` iteration cap, engine PR #1) + state-loop restore fix
-(engine PR #2). **NEXT: item 2 — cold-start prerequisites** (`templates/corpus/`, engine `LICENSE`/`CLAUDE.md`,
-`docs/FACTORY.md`). Remaining v1.0: 2nd market cold via /init-market · L6 portfolio · engine marketplace
-publish + `bump-engine` propagation.
+(engine PR #2) + item 2 (cold-start prerequisites, engine PR #3). **NEXT: item 3 — 2nd market cold via
+`/init-market`** (the real "config + seed, not code" proof; acceptance = 2nd market → Beta from a cold seed).
+Remaining v1.0: L6 portfolio · engine marketplace publish + `bump-engine` propagation.
 
 > Note: "engine PR #1/#2" = PRs on `drbothen/research-factory` (the engine). Distinct from instance
 > `1898andCo/ot-ics-research` PRs (its PR #1 federal-dod-buyer, PR #2 international-cohort).
@@ -25,8 +25,11 @@ state-manager recorded its run in the instance `.factory/STATE.md` track build l
    threaded through the 4 loop lobsters + orchestrator + build-track SKILL + nightly/ingest Actions. On cap →
    commit-what-it-has + PR flagged "did not fully converge, M MUST-FIX remain." Cap value validated as sane:
    the international-cohort run converged at **pass 5** (< 6), so 6 would not have false-triggered (but it's snug).
-2. **Cold-start prerequisites:** ship `templates/corpus/` (generic L2/L3/summary/L4 doc templates — a cold 2nd market has nothing to copy) + engine `LICENSE` + engine `CLAUDE.md` (+ `docs/FACTORY.md`) — needed before publish. **← NEXT (in progress)**
-3. **2nd market cold via `/init-market`** — the real proof of "config + seed, not code". Acceptance: 2nd market → Beta from a cold seed.
+2. ✅ **Cold-start prerequisites** — DONE (engine PR #3, merged `caf4cea`). Shipped: MIT `LICENSE`; root
+   `CLAUDE.md` (engine constitution + layout + build/test); `docs/FACTORY.md` (operator orientation);
+   `templates/corpus/` (L2-baseline +tldr, L3-findings +tldr with the mandatory vector-coverage table,
+   track-summary, L4-cross-track-synthesis, README) — wired into the build-track + init-market skills.
+3. **2nd market cold via `/init-market`** — the real proof of "config + seed, not code". Acceptance: 2nd market → Beta from a cold seed. **← NEXT**
 4. **L6 portfolio** — `research-portfolio` repo + `portfolio-synth.lobster` (the 7th workflow). Acceptance: an L6 cross-market brief, human-approved.
 5. **Engine release** — marketplace publish + `bump-engine` cross-instance version-propagation Action. Acceptance: a version bump propagates to instances via PR.
 (Optional/stretch: 5 deferred state hooks · `github-ops` + orchestrator sequence playbooks · WASM `factory-dispatcher` · autonomy 3.5.)
@@ -88,8 +91,8 @@ stays OFF (it echoes tool results incl. secrets into the log).
 - **Hooks 4/9** (have: require-citation, layer-discipline, protect-secrets, forbidden-phrase). Deferred (state-dependent, in `docs/HOOKS.md`): source-faithfulness-guard, anchor-not-strip-guard, convergence-tracker, protect-canonical, factory-branch-guard.
 - **Agents 11/12** — missing `github-ops`; no `orchestrator/*-sequence` playbooks.
 - **Workflows 6/7** — missing `portfolio-synth` (v1.0/L6).
-- **Templates** — no `templates/corpus/` generic doc templates for new markets.
-- **Docs/dirs** — missing `docs/FACTORY.md`, `CONVERGENCE.md`; unused `data/`, `checklists/`; no engine `LICENSE` / `CLAUDE.md`.
+- **Templates** — ✅ `templates/corpus/` shipped (engine PR #3): L2-baseline+tldr, L3-findings+tldr, track-summary, L4-cross-track-synthesis, README.
+- **Docs/dirs** — ✅ `docs/FACTORY.md` + engine `LICENSE` (MIT) + root `CLAUDE.md` shipped (engine PR #3). Still missing: `CONVERGENCE.md`; unused `data/`, `checklists/`.
 - **State model** — ✅ `.factory/` now on the orphan `factory-artifacts` branch worktree (§11), gitignored on `main`. Deferred: INDEX sharding, size-cap hook.
 
 ## Open items (not blockers)
@@ -123,6 +126,7 @@ stays OFF (it echoes tool results incl. secrets into the log).
   `.factory/STATE.md`. Avoids double-push and fragile haiku git surgery.
 - 2026-06-01: **also commit the cap fix to the engine on a feature branch → PR → squash-merge** (operator chose
   push-and-merge over hold-local); CI `test` gate must be green before merge.
+- 2026-06-01: **engine LICENSE = MIT** (operator choice — maximal adoption for a public marketplace others clone).
 
 ## How to resume (cold session, zero prior context)
 
