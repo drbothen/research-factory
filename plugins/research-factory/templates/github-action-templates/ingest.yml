@@ -40,7 +40,10 @@ jobs:
             New source(s) landed in seed/inbox/. Run the research-factory ingest-source workflow:
             capture → quarantine-fetch → draft the L1/L2 observation with a citation on every
             claim (or an explicit [Source needed]/[Access required] flag) → editorial-sweep →
-            citation-verify → adversary loop to PASS → state-manager. Open a PR. DO NOT merge.
+            citation-verify → adversary loop (capped at convergence.max_passes, default 6) →
+            state-manager. Loop to an adversary PASS, or stop at the cap if it will not converge —
+            never grind unbounded. Commit either way; if you exit on the cap, FLAG the PR title
+            "[DID NOT CONVERGE: M MUST-FIX]" and say so in the body. Open a PR. DO NOT merge.
 
       # --- audit: persist the full Claude conversation/execution log ---
       - name: Upload Claude execution log

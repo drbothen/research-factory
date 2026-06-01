@@ -39,19 +39,27 @@ steps:
     agent: adversary-reviewer
     depends_on: [citation-verify]
     timeout: 1800
-    # loop until VERDICT: PASS with novelty < threshold for clean_passes_required
+    # loop until VERDICT: PASS with novelty < threshold for clean_passes_required,
+    # OR until max_passes is reached (whichever comes first — see on_cap).
     convergence:
       novelty_threshold: 0.15
       clean_passes_required: 3
+      max_passes: 6            # hard cap; default mirrors factory.config convergence.max_passes
+      on_cap: commit-flagged   # cap hit without convergence → still commit, but flag the PR
     context:
       exclude: [prior-review-passes, drafter-reasoning, orchestrator-summary]
 
   - name: gate-pass
     type: gate
     depends_on: [adversary-review]
+    # Normal exit: full convergence → clean commit.
+    # Capped exit (on_cap): the loop stopped at max_passes with MUST-FIX remaining → DO NOT abort.
+    #   Commit what we have and flag the PR "did not fully converge, M MUST-FIX remain" so an
+    #   unattended run never burns the job timeout and commits nothing. The flag is the gate's output.
     criteria:
-      ADVERSARY_VERDICT: PASS
-      MUST_FIX_REMAINING: 0
+      pass_when: "(ADVERSARY_VERDICT == PASS and MUST_FIX_REMAINING == 0) or LOOP_CAPPED == true"
+    on_capped_exit:
+      flag_pr: "did not fully converge — {MUST_FIX_REMAINING} MUST-FIX remain after {max_passes} passes"
 
   - name: commit
     type: agent

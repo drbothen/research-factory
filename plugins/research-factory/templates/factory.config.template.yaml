@@ -38,6 +38,13 @@ review:
   convergence:
     novelty_threshold: 0.15
     clean_passes_required: 3
+    max_passes: 6                        # hard iteration cap on the adversary loop.
+                                         # On a heavily-flawed draft the loop can thrash without
+                                         # ever reaching clean_passes_required. After max_passes
+                                         # the loop STOPS, commits what it has, and opens a PR
+                                         # flagged "did not fully converge, M MUST-FIX remain" —
+                                         # so an unattended night-shift run never burns the whole
+                                         # job timeout and commits nothing. ≥ clean_passes_required.
 autonomy_level: 3                         # 3 = human gate on every merge (start here)
                                           # 3.5 = auto-merge low-risk research PRs (0 markers,
                                           #       adversary PASS, no editorial drift); human for
