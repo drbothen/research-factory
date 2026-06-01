@@ -17,6 +17,11 @@ This file records what each phase delivered.
 - **Cold-start prerequisites:** engine `LICENSE` (MIT) · root `CLAUDE.md` (engine constitution + layout +
   build/test) · `docs/FACTORY.md` (operator orientation) · `templates/corpus/` (generic L2/L3/summary/L4
   doc skeletons a cold market scaffolds from — wired into the build-track and init-market skills).
+- **Generic `docs/review-spec.md`** (`templates/instance-docs/review-spec.md`): the market-agnostic
+  6-dimension adversary-review spec that `on-pr-review.yml` reads as the Codex `prompt-file`. A cold market
+  lacked it (only the OT instance had an OT-specific one) → the cross-family Codex review fast-failed with
+  ENOENT. Now shipped in the template so every cold market's cross-family review works. Surfaced by the
+  first cold build on market #2 (`medical-device-security`).
 
 ## 0.9.0 — PM pipeline (2026-05-31)
 
