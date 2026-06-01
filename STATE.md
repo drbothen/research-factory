@@ -5,6 +5,31 @@
 
 Last updated: 2026-06-01.
 
+## ▶ RESUME NEXT SESSION — start item 4: the L6 portfolio
+
+**v1.0 items #1–#3 are DONE** (cap, state-restore, cold-start prereqs, review-spec, working cross-family
+review, 2nd market proven cold). The public engine + template were org-scrubbed and made public; both
+market corpora stay private. **Pick up at v1.0 item #4 — the L6 cross-market portfolio.** There are now
+**two real markets** to synthesize across — `<your-org>/ot-ics-research` (OT/ICS) and
+`<your-org>/medical-device-security-research` (healthcare) — sharing vendors (Claroty/Armis/Forescout) and
+governance (CISA), so the L6 synthesis has genuine content.
+
+**Concrete first steps for item 4** (design: BUILD-PLAN §3 L6, §6 repos, §9 `portfolio-synth.lobster` line 321,
+§12 `portfolio-rollup.yml` line 389; acceptance = one L6 cross-market brief, human-approved):
+1. **Build `portfolio-synth.lobster`** — the missing 7th workflow (engine `plugins/research-factory/workflows/`).
+   Shape: pull each registered instance's L4/L5 outputs → synthesizer (L6, cites named L4/L5 of each market) →
+   adversary review (capped) → **human-approval** → cross-market brief. L6 is cross-market *judgment* — always
+   human-gated. Validate with `lobster-parse validate`.
+2. **L6 doc template** — add `templates/corpus/L6-portfolio-synthesis.md` (observes L4/L5 across markets; cites
+   named market L4/L5; carries a market×vector roll-up). Mirror the L4 template's shape.
+3. **Create `<your-org>/research-portfolio`** (PRIVATE) from the template, with a manifest registering the two
+   instances. Install a `portfolio-rollup.yml` Action (`cron: 0 9 * * 1`) that runs `portfolio-synth` across
+   registered instances → L6 brief → human-gated PR. (`init-market` step 7 already says "register in portfolio".)
+4. **Run it** to produce the first L6 brief (OT × medical-device) → human-approved. That's the item-4 acceptance.
+   Then item #5 (engine marketplace publish + `bump-engine` propagation) closes v1.0.
+
+Everything below is the durable detail. **Read this file top-to-bottom on a cold resume.**
+
 ## Current phase
 
 **v1.0 IN PROGRESS.** Done: item 1 (cap, engine PR #1) + state-restore (PR #2) + item 2 (cold-start, PR #3)
