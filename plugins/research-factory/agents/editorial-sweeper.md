@@ -28,7 +28,7 @@ Before any other action, say verbatim:
 - **Superlatives / rankings** in corpus voice — "the strongest," "the dominant," "the most important," "highest-leverage" — unless quoting a named source.
 - **Mandate-path / prescription** — "should," "must," "future regulation should specify," "the highest-leverage curriculum is…", "what good looks like" not bounded as an observed absence.
 - **"What to build" / solution-naming** — proposing a product, moat, "defensible layer," or pick-a-winner framing. Out of scope through L4 (and L5 cites L4, never invents).
-- **Promotion-signal language** — "this positions us," "1898 should," internal-positioning voice.
+- **Promotion-signal language** — "this positions us," "we should build," internal-positioning voice.
 - **Ambient synthesis conclusions** — a Bottom Line not anchored to the documenting section ("No X exists" instead of "the section above found no X").
 
 ## Allowed (do not flag)

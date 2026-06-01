@@ -59,15 +59,15 @@ Adapted from the Dark Factory manifesto, tempered by the validation research (§
 │ + Actions caller│    │ + Actions caller│   │ + Actions caller│     │ + Actions          │
 └───────────────┘      └───────────────┘    └───────────────┘       └──────────────────┘
   ENGINE + TEMPLATE → org `drbothen` (generic tooling)
-  INSTANCES + PORTFOLIO → org `1898andCo` (company research content)
+  INSTANCES + PORTFOLIO → org `<your-org>` (your company research content)
 ```
 
-**Org split:** the **engine is generic tooling** and lives under `drbothen` alongside the other factories (`drbothen/vsdd-factory`, `drbothen/brain-factory`, `drbothen/secops-factory`). The **research corpora are 1898 business content** and live under `1898andCo`. Cross-org templating works because the owner (`drbothen`) is a member of `1898andCo`.
+**Org split:** the **engine is generic tooling** and lives under `drbothen` alongside the other factories (`drbothen/vsdd-factory`, `drbothen/brain-factory`, `drbothen/secops-factory`). The **research corpora are your your company research content** and live under `<your-org>`. Cross-org templating works because the owner (`drbothen`) is a member of `<your-org>`.
 
 - **Engine** = one Claude Code plugin repo, `drbothen/research-factory`. Stateless, read-only at runtime. Versioned + released to the `drbothen/claude-mp` marketplace family.
 - **Template** = `drbothen/research-factory-template`, the thin starter an instance is generated from (engine-adjacent tooling).
-- **Instance** = one repo per market (`1898andCo/ot-ics-research`, …). Holds config, seed, the growing corpus, per-instance `.factory/` state, and a thin GitHub Actions caller that invokes the engine headlessly.
-- **Portfolio** = `1898andCo/research-portfolio`. Reads each instance's L4/L5 outputs (git submodules or the GitHub API) and produces the cross-market L6 synthesis (decision per §6 / user: build in v1).
+- **Instance** = one repo per market (`<your-org>/ot-ics-research`, …). Holds config, seed, the growing corpus, per-instance `.factory/` state, and a thin GitHub Actions caller that invokes the engine headlessly.
+- **Portfolio** = `<your-org>/research-portfolio`. Reads each instance's L4/L5 outputs (git submodules or the GitHub API) and produces the cross-market L6 synthesis (decision per §6 / user: build in v1).
 
 ---
 
@@ -118,7 +118,7 @@ Everything domain-specific lives in a per-instance `factory.config.yaml` + a `se
 # --- identity ---
 market: "OT/ICS Security"            # human name
 slug: "ot-ics"                        # kebab id used in paths/branches
-audience: "Burns & McDonnell / 1898 & Co. colleagues + their AI assistants"
+audience: "your organization colleagues + their AI assistants"
 phase: "observe-and-report"           # or "judgment" | "productization"
 
 # --- the seed (Dark Factory P1) ---
@@ -188,14 +188,14 @@ deliverables:
 drbothen/                     ← generic tooling (with the other factories)
   research-factory            ← ENGINE plugin (versioned, released to marketplace)
   research-factory-template   ← thin starter repo (config stub + seed stub + Actions caller)
-1898andCo/                    ← company research content
+<your-org>/                    ← your company research content
   ot-ics-research             ← INSTANCE #1 (OT/ICS) — migrate the existing 27-track corpus here
   <market2>-research          ← INSTANCE #2 (created from template)
   research-portfolio          ← L6 cross-market synthesis (reads each instance's L4/L5)
 ```
 
 **Adding a market** (the dynamic requirement, made concrete) — `/research-factory:init-market <slug>`:
-1. `gh repo create 1898andCo/<slug>-research --template drbothen/research-factory-template --private`
+1. `gh repo create <your-org>/<slug>-research --template drbothen/research-factory-template --private`
 2. The `init-market` skill interviews for the seed (scope, vectors, tracks, sources), writes `factory.config.yaml` + `seed/`.
 3. Installs the per-instance GitHub Actions (the engine's `templates/github-action-templates/*`).
 4. Initializes `.factory/` state (orphan-branch worktree) + writes `STATE.md`.
@@ -450,7 +450,7 @@ Every first-class component (the 7 workflows §9, 12 agents §8, 4 repos §6, th
 
 **Phases: P0 ✅ · v0.1 ✅ · v0.5 ✅ · v0.8 ✅ · v0.9 ✅ · v1.0 ⬜.** Live proof: instance **PR #1** (night-shift
 `build-track` → adversary PASS → human-merged, autonomy 3). Three repos shipped: `drbothen/research-factory`,
-`drbothen/research-factory-template`, `1898andCo/ot-ics-research`. Live status: [`.factory/STATE.md`](./.factory/STATE.md).
+`drbothen/research-factory-template`, `<your-org>/ot-ics-research`. Live status: [`.factory/STATE.md`](./.factory/STATE.md).
 
 **Specified in §7–§12 but deferred** (built lean; none blocked the acceptance gates that passed):
 - **Hooks — 4 of 9 implemented** (require-citation, layer-discipline, protect-secrets, forbidden-phrase; live + tested).
@@ -484,7 +484,7 @@ The Dark Factory "Shift Work" technique, made literal:
 | Step | Where | What happens |
 |---|---|---|
 | 1. Build the engine | Claude Code (local) | Scaffold the `research-factory` plugin (v0.1 skeleton). |
-| 2. Create the instance repo | `gh` (you) | `gh repo create 1898andCo/ot-ics-research --template drbothen/research-factory-template --private` |
+| 2. Create the instance repo | `gh` (you) | `gh repo create <your-org>/ot-ics-research --template drbothen/research-factory-template --private` |
 | 3. Seed it | Claude Code, interactive | `/research-factory:init-market ot-ics` — Claude **interviews you** (scope, 7 vectors, 27 tracks, sources) → writes `factory.config.yaml` + `seed/`. |
 | 4. Migrate the OT corpus | Claude Code | Move the 27 tracks into `corpus/`; map existing process docs to the editorial profile. |
 | 5. Install Actions | `/init-market` | Copies Action templates into `.github/workflows/`; sets cron schedules. |

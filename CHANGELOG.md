@@ -68,7 +68,7 @@ This file records what each phase delivered.
 - Double-manifest plugin; 4 agents (researcher, citation-verifier, adversary-reviewer, state-manager);
   `build-track` skill; FACTORY-SOUL + LAYER-MODEL docs; config loader (`bin/factory-config.sh`).
 - `require-citation` PreToolUse:Write hook — proven to block an uncited corpus write in a headless run.
-- OT instance migrated (`1898andCo/ot-ics-research`); build-track → adversary PASS on one track.
+- OT instance migrated (`<your-org>/ot-ics-research`); build-track → adversary PASS on one track.
 
 ## P0 — prerequisites (2026-05-31)
 
