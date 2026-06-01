@@ -83,7 +83,7 @@ human-gated**, at any autonomy level. Budget thresholds (warn/alert/pause/hard-s
 |---|---|---|
 | `drbothen/research-factory` | the engine (this repo) | public (marketplace clone) |
 | `drbothen/research-factory-template` | thin instance starter | private |
-| `<org>/<market>-research` | a market instance (e.g. `1898andCo/ot-ics-research`) | private |
+| `<org>/<market>-research` | a market instance (e.g. `<your-org>/ot-ics-research`) | private |
 | `research-portfolio` | L6 cross-market rollups | private |
 
 ## State & resume (§11)

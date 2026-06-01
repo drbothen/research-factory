@@ -12,7 +12,7 @@ See [`BUILD-PLAN.md`](./BUILD-PLAN.md) for the full design (self-contained; read
 ## Status
 
 - [x] **P0** — secrets hygiene; 3 vendor keys provisioned + validated (hello-world Action green)
-- [x] **v0.1** — plugin skeleton; require-citation hook (proven headless); config loader; OT instance #1 (`1898andCo/ot-ics-research`) migrated + build-track loop validated (adversary PASS)
+- [x] **v0.1** — plugin skeleton; require-citation hook (proven headless); config loader; OT instance #1 (`<your-org>/ot-ics-research`) migrated + build-track loop validated (adversary PASS)
 - [x] **v0.5** — `.lobster` workflow engine (`bin/lobster-parse`) + 5 workflows; 6 more agents (orchestrator, synthesizer, judgment-writer, consistency-validator, editorial-sweeper, dashboard-builder); 4 fail-closed hooks (see `plugins/research-factory/docs/HOOKS.md`); `release.yml`
 - [x] **v0.8** — per-instance Action templates wiring the 3 vendor CLIs (Claude builds · Codex+Gemini review); autonomy/budget plumbing (`docs/AUTONOMY.md`); `/init-market` skill; `research-factory-template` repo (`drbothen/research-factory-template`)
 - [x] **v0.9** — PM pipeline: `pm-doc-writer` + `pm-doc-chain.lobster` (Dev-Readiness gate) + `templates/pm/`; acceptance run produced dev-ready PRD + stories from an OT finding.
@@ -28,4 +28,4 @@ Test suite: 34 bats cases (config, hooks, lobster). CI validates manifests, all 
 | adversary reviewer | `openai/codex-action@v1` | `gpt-5.5` (default) · `gpt-5.4` · `gpt-5.3-codex` |
 | citation verifier | `google-github-actions/run-gemini-cli@v0` | `gemini-3-pro` |
 
-Engine lives under `drbothen`; research instances under `1898andCo`.
+Engine lives under `drbothen`; research instances under `<your-org>`.

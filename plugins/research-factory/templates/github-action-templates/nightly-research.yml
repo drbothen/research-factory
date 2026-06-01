@@ -54,7 +54,7 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           # NO github_token override → the action uses the Claude GitHub App token, which has
-          # workflows:write (verified on the 1898andCo install) and CAN push branches whose range
+          # workflows:write (verified on the <your-org> install) and CAN push branches whose range
           # touches .github/workflows/. GITHUB_TOKEN cannot — that was the blocked-push root cause.
           # The App token also triggers on-pr-review when Claude opens the PR (GITHUB_TOKEN would not).
           # Enable the engine plugin natively (verified input keys); engine repo is public.

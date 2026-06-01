@@ -27,13 +27,13 @@ case "$FILE_PATH" in */templates/*|*/_meta/*|*/seed/*) emit_allow ;; esac
 case "$(basename "$FILE_PATH")" in README.md|STATE.md|MEMORY.md|*-index.md|index.md) emit_allow ;; esac
 [ -z "$CONTENT" ] && emit_allow
 
-# Bright-line positioning / "what to build" phrases (case-insensitive).
-# These assert company action or a product decision — out of scope through L4
-# and never sourced-attributable in a way that belongs in corpus voice.
-FORBIDDEN='(we should build|we recommend building|1898 should|burns ?& ?mcdonnell should|burns and mcdonnell should|the product we should build|our recommendation is to build|the moat is|where we should invest|pick a winner|we should prioritize building)'
+# Bright-line positioning / "what to build" phrases (case-insensitive). Generic patterns only —
+# market-specific company names (e.g. "<your company> should build") belong in the instance's
+# editorial.forbidden_phrases_extra (P10: no market-specific logic in the generic engine).
+FORBIDDEN='(we should build|we recommend building|the product we should build|our recommendation is to build|the moat is|where we should invest|pick a winner|we should prioritize building)'
 
 if printf '%s' "$CONTENT" | grep -qiE "$FORBIDDEN"; then
   hit=$(printf '%s' "$CONTENT" | grep -ioE "$FORBIDDEN" | head -1)
-  emit_deny "Observe-and-report violation: corpus doc contains company-positioning / 'what to build' language (\"$hit\"). The corpus is observe-only through L4; 'what 1898 should build' is out of scope. Reframe as a sourced observation, or move judgment to L5 (which cites L4). ($FILE_PATH)"
+  emit_deny "Observe-and-report violation: corpus doc contains company-positioning / 'what to build' language (\"$hit\"). The corpus is observe-only through L4; 'what the company should build' is out of scope. Reframe as a sourced observation, or move judgment to L5 (which cites L4). ($FILE_PATH)"
 fi
 emit_allow

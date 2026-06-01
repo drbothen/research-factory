@@ -52,7 +52,7 @@ payload() { jq -nc --arg fp "$1" --arg c "$2" '{tool_name:"Write", tool_input:{f
 
 # ---- forbidden-phrase-guard ----
 @test "forbidden-phrase: DENIES company positioning in a corpus doc" {
-  body=$'# Note\n\nGiven the gap, 1898 should build a consequence-reduction product.\n'
+  body=$'# Note\n\nGiven the gap, we should build a consequence-reduction product.\n'
   run bash "$HDIR/forbidden-phrase-guard.sh" <<< "$(payload /x/corpus/t/foo.md "$body")"
   [ "$status" -eq 0 ]; [[ "$output" == *'"deny"'* ]]
 }
