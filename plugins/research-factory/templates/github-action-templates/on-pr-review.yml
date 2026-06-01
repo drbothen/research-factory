@@ -1,11 +1,21 @@
 # on-pr-review.yml — cross-family review gate (installed into an instance's .github/workflows/).
 # When a PR opens, two DIFFERENT model families review the diff (P6 cognitive diversity):
-#   - OpenAI Codex   → the 6-dimension adversary review (prompt-file = docs/review-spec.md)
+#   - OpenAI Codex   → the 6-dimension adversary review (spec = docs/review-spec.md)
 #   - Gemini CLI     → the source-faithfulness / citation pass
-# Findings post as PR review comments. This is the GATE, not a merge — humans merge (autonomy 3).
+# Findings post as PR comments. This is the GATE, not a merge — humans merge (autonomy 3).
 #
-# ⚠ Build-time: confirm each Action's input keys + current model IDs against vendor docs
-#   (BUILD-PLAN §8 ⚠). Tags are floating-major; model literals verified 2026-05-31.
+# DIFF-SCOPED: each reviewer is told exactly which files this PR changed (gh pr diff --name-only) and
+# reviews ONLY those — otherwise the reviewer has the whole checkout but no scope and no-ops.
+#
+# NO BLACK BOXES (operator rule): both reviewers upload their full output as an artifact AND post their
+# findings back as a PR comment (parity with the night-shift claude-execution-log).
+#
+# SCOPED MCP: reviewers get Perplexity search to strengthen source-faithfulness (P3) — they can check
+# whether a cited source supports a claim. The review-spec/prompt fences this to VERIFICATION ONLY
+# (never author or suggest new corpus content). The npx MCP server inherits PERPLEXITY_API_KEY from the
+# job env (do NOT set a literal $VAR in the settings env block — that overrides the real inherited key).
+#
+# ⚠ Build-time: confirm each Action's input keys + current model IDs against vendor docs (BUILD-PLAN §8 ⚠).
 name: on-pr-review
 on:
   pull_request:
@@ -26,19 +36,51 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
+      - name: Assemble diff-scoped review prompt
+        id: prep
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            cat docs/review-spec.md
+            echo; echo "---"
+            echo "# THIS PR — review ONLY the files changed below. Read each from the checkout, assess"
+            echo "# against ALL six dimensions, and output structured findings + a VERDICT (PASS/REVISE)."
+            echo "## Changed files:"
+            gh pr diff ${{ github.event.pull_request.number }} --repo ${{ github.repository }} --name-only
+          } > review-prompt.md
       - name: Codex adversary review (different family than the Claude builder)
+        id: codex
         uses: openai/codex-action@v1
+        env:
+          PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}   # inherited by the MCP server
         with:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
           model: gpt-5.5                       # default adversary model (verified 2026-05-31)
           sandbox: read-only                   # adversary never writes the corpus
           safety-strategy: read-only
-          # The night-shift PR is authored by the App (claude[bot]); allow our own bot past the
-          # actor write-access guard so it can review bot-authored PRs (it sees claude[bot] as 'none').
-          allow-bots: true
+          allow-bots: true                     # PR is authored by claude[bot]; allow our bot past the guard
           allow-bot-users: "claude[bot]"
-          prompt-file: docs/review-spec.md     # the 6-dimension spec (vendor-neutral)
-          # Codex reviews the PR diff and posts findings as review comments.
+          prompt-file: review-prompt.md        # review-spec + the diff scope (assembled above)
+          output-file: codex-review.md         # full final message → artifact + PR comment (no black box)
+          codex-args: >-
+            --config mcp_servers={'perplexity'={'command'='npx','args'=['-y','@perplexity-ai/mcp-server']}}
+      - name: Upload Codex review log (no black box)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: codex-review-log-${{ github.run_id }}
+          path: codex-review.md
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Post Codex findings as a PR comment
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          [ -s codex-review.md ] || { echo "no Codex output to post"; exit 0; }
+          { echo "## 🔴 Codex adversary review (gpt-5.5)"; echo; cat codex-review.md; } > codex-comment.md
+          gh pr comment ${{ github.event.pull_request.number }} --repo ${{ github.repository }} --body-file codex-comment.md
 
   citation-verify:
     runs-on: ubuntu-latest
@@ -46,18 +88,51 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
+      - name: Compute changed files
+        id: prep
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          files="$(gh pr diff ${{ github.event.pull_request.number }} --repo ${{ github.repository }} --name-only)"
+          { echo "files<<EOF"; echo "$files"; echo "EOF"; } >> "$GITHUB_OUTPUT"
       - name: Gemini source-faithfulness pass (third independent family)
+        id: gemini
         uses: google-github-actions/run-gemini-cli@v0
         env:
-          # gemini-cli refuses untrusted workspaces in headless mode; trust the checkout explicitly.
-          GEMINI_CLI_TRUST_WORKSPACE: "true"
+          GEMINI_CLI_TRUST_WORKSPACE: "true"                     # trust the checkout (headless)
+          PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}  # inherited by the MCP server (NOT set in settings)
         with:
-          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}   # verified input key (snake_case)
-          # gemini_model left UNSET → the CLI picks a current valid default. ("gemini-3-pro" was
-          # NOT a valid generateContent model ID on the API — pin a verified ID here only if needed.)
-          # Checks: does each cited source SUPPORT the claim? (P3) — a URL is not enough.
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          upload_artifacts: true                                 # upload CLI session output (no black box)
+          # MCP server inherits PERPLEXITY_API_KEY from the job env — do NOT put a literal "$VAR" in the
+          # env block here, that overrides the real key with an unexpanded string (the v1 failure).
+          settings: |
+            {
+              "mcpServers": {
+                "perplexity": {
+                  "command": "npx",
+                  "args": ["-y", "@perplexity-ai/mcp-server"],
+                  "timeout": 30000,
+                  "trust": true
+                }
+              }
+            }
           prompt: |
-            You are the citation-verifier. For each cited claim in this PR diff, verify the
-            cited source actually supports the claim (NLI-style): SUPPORTED / PARTIAL /
-            UNSUPPORTED / CONTRADICTED / UNREACHABLE. Post UNSUPPORTED/CONTRADICTED as
-            review comments (MUST-FIX). Do not guess an unreachable source.
+            You are the citation-verifier (P3 source-faithfulness). Review ONLY these files changed in
+            this PR — read each from the checkout:
+            ${{ steps.prep.outputs.files }}
+
+            For each cited claim, verify the cited source actually supports the claim (NLI-style):
+            SUPPORTED / PARTIAL / UNSUPPORTED / CONTRADICTED / UNREACHABLE. Use the Perplexity MCP tools
+            ONLY to check whether a cited source supports a claim — never to author or suggest new corpus
+            content. Output your verdicts; mark UNSUPPORTED/CONTRADICTED as MUST-FIX. Do not guess an
+            unreachable source.
+      - name: Post Gemini findings as a PR comment
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SUMMARY: ${{ steps.gemini.outputs.summary }}
+        run: |
+          [ -n "$SUMMARY" ] || { echo "no Gemini summary to post"; exit 0; }
+          printf '## 🔵 Gemini citation-verify (source-faithfulness)\n\n%s\n' "$SUMMARY" > gemini-comment.md
+          gh pr comment ${{ github.event.pull_request.number }} --repo ${{ github.repository }} --body-file gemini-comment.md

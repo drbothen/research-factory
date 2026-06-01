@@ -22,6 +22,17 @@ This file records what each phase delivered.
   lacked it (only the OT instance had an OT-specific one) → the cross-family Codex review fast-failed with
   ENOENT. Now shipped in the template so every cold market's cross-family review works. Surfaced by the
   first cold build on market #2 (`medical-device-security`).
+- **`on-pr-review.yml` — the cross-family review now actually reviews.** Three latent gaps, all surfaced
+  by adding reviewer audit artifacts: (1) **diff scope** — reviewers were given the review-spec but never
+  the PR's changed files, so Codex no-op'd ("send me the diff"); now each reviewer is fed `gh pr diff
+  --name-only`. (2) **comment posting** — `codex-action`/`run-gemini-cli` don't auto-post; added `gh pr
+  comment` steps (env-var + `--body-file`, no shell-interpolation of model output). (3) **reviewer MCP** —
+  scoped Perplexity for source-faithfulness (Gemini fetches + checks the cited source; Codex
+  verification-only); the MCP server inherits `PERPLEXITY_API_KEY` from job env (a literal `$VAR` in the
+  settings block was overriding the real key). **No black boxes:** both reviewers upload full output as an
+  artifact. Validated on a planted-error PR — both caught a false "HIPAA NPRM is final" claim and an
+  unsourced Type-2 market claim; Gemini's Perplexity found the real market-size figure. Resolves the
+  standing "reviewers run green but post 0 comments" open item.
 
 ## 0.9.0 — PM pipeline (2026-05-31)
 
