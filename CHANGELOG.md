@@ -3,6 +3,21 @@
 Build progress is tracked authoritatively in [`.factory/STATE.md`](./.factory/STATE.md).
 This file records what each phase delivered.
 
+## Unreleased — toward v1.0
+
+- **build-track iteration cap** (#1): `convergence.max_passes` (default 6) threaded through the 4 loop
+  workflows + orchestrator + build-track skill + nightly/ingest Actions. The adversary loop no longer
+  runs away on a non-converging draft — on cap it commits what it has and flags the PR
+  "did not fully converge, M MUST-FIX remain." Autonomous loops commit-flagged; human-gated loops
+  surface-to-human.
+- **Night-shift state-restore** (#2): the persist-only state loop was a no-op (it pushed nothing because
+  the workspace `.factory/` started empty). Added a "Restore pipeline state from factory-artifacts" step
+  to `nightly-research.yml` (mirror of persist) and clarified the state-manager's CI role: the workflow
+  owns the branch round-trip; the agent only writes the workspace `.factory/STATE.md`.
+- **Cold-start prerequisites:** engine `LICENSE` (MIT) · root `CLAUDE.md` (engine constitution + layout +
+  build/test) · `docs/FACTORY.md` (operator orientation) · `templates/corpus/` (generic L2/L3/summary/L4
+  doc skeletons a cold market scaffolds from — wired into the build-track and init-market skills).
+
 ## 0.9.0 — PM pipeline (2026-05-31)
 
 - `pm-doc-writer` agent (from pm-process/pm-docs-gpt-prompt.md): principal-PM voice, MVF-vs-Future,
