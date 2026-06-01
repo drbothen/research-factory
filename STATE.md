@@ -3,12 +3,17 @@
 **The one file to read to resume.** Authoritative, versioned, in-repo. Pairs with `BUILD-PLAN.md`
 (the design) and `git log` (the artifacts). My machine-local memory is only a pointer to this.
 
-Last updated: 2026-05-31.
+Last updated: 2026-06-01.
 
 ## Current phase
 
-**v0.9 COMPLETE.** Next: **v1.0** — portfolio (L6) + a real 2nd market via /init-market + engine marketplace
-publish + `bump-engine` cross-instance version propagation.
+**v1.0 IN PROGRESS.** Done: item 1 (`build-track` iteration cap, engine PR #1) + state-loop restore fix
+(engine PR #2). **NEXT: item 2 — cold-start prerequisites** (`templates/corpus/`, engine `LICENSE`/`CLAUDE.md`,
+`docs/FACTORY.md`). Remaining v1.0: 2nd market cold via /init-market · L6 portfolio · engine marketplace
+publish + `bump-engine` propagation.
+
+> Note: "engine PR #1/#2" = PRs on `drbothen/research-factory` (the engine). Distinct from instance
+> `1898andCo/ot-ics-research` PRs (its PR #1 federal-dod-buyer, PR #2 international-cohort).
 
 Also notable: **PR #1 was human-merged** — federal-dod-buyer night-shift work is now `status/active` on the
 instance `main` (the autonomy-3 human-merge step, closing the full v0.8 loop end to end), and the night-shift
@@ -16,16 +21,29 @@ state-manager recorded its run in the instance `.factory/STATE.md` track build l
 
 ### What's left to v1.0 (recommended order)
 
-1. **`build-track` iteration cap** — the load-bearing fix (see Open items). Do FIRST; de-risks unattended scale.
-2. **Cold-start prerequisites:** ship `templates/corpus/` (generic L2/L3/summary/L4 doc templates — a cold 2nd market has nothing to copy) + engine `LICENSE` + engine `CLAUDE.md` (+ `docs/FACTORY.md`) — needed before publish.
+1. ✅ **`build-track` iteration cap** — DONE (engine PR #1, merged `bee28fa`). `convergence.max_passes: 6`
+   threaded through the 4 loop lobsters + orchestrator + build-track SKILL + nightly/ingest Actions. On cap →
+   commit-what-it-has + PR flagged "did not fully converge, M MUST-FIX remain." Cap value validated as sane:
+   the international-cohort run converged at **pass 5** (< 6), so 6 would not have false-triggered (but it's snug).
+2. **Cold-start prerequisites:** ship `templates/corpus/` (generic L2/L3/summary/L4 doc templates — a cold 2nd market has nothing to copy) + engine `LICENSE` + engine `CLAUDE.md` (+ `docs/FACTORY.md`) — needed before publish. **← NEXT (in progress)**
 3. **2nd market cold via `/init-market`** — the real proof of "config + seed, not code". Acceptance: 2nd market → Beta from a cold seed.
 4. **L6 portfolio** — `research-portfolio` repo + `portfolio-synth.lobster` (the 7th workflow). Acceptance: an L6 cross-market brief, human-approved.
 5. **Engine release** — marketplace publish + `bump-engine` cross-instance version-propagation Action. Acceptance: a version bump propagates to instances via PR.
 (Optional/stretch: 5 deferred state hooks · `github-ops` + orchestrator sequence playbooks · WASM `factory-dispatcher` · autonomy 3.5.)
 
-### In-flight at last context clear (2026-05-31)
+### State-model validation RESULT (2026-06-01) — run `26732442937` on `international-cohort`
 
-- **Validation run** of the `factory-artifacts` state-push: `nightly-research` run `26732442937` on `international-cohort` (instance) was `in_progress`. CHECK IT FIRST on resume: `gh run view 26732442937 --repo 1898andCo/ot-ics-research`. Verifying: (a) `claude/international-cohort*` branch + PR opened, (b) `.factory/STATE.md` pushed to `factory-artifacts` (compare HEAD vs `937a1f6` — the pre-run SHA), (c) STATE.md history preserved not clobbered (the state-manager writes a fresh STATE.md in CI since `.factory` is gitignored on `main` — if it clobbers the track log, the run will show it; fix = fetch `factory-artifacts` STATE at build start).
+The in-flight validation run completed **success** (51m34s; converged at adversary pass 5, not a runaway).
+- **(a) ✅** `claude/international-cohort-beta-advance` branch + **PR #2** opened on the instance.
+- **(b) ❌→FIXED** Persist step logged `no .factory state written this run`; `factory-artifacts` HEAD never
+  moved off pre-run `937a1f6`. **Root cause:** the night-shift loop persisted `.factory/` at the END but never
+  RESTORED it at the START — the instance checkout begins empty (`.factory` gitignored on `main`), so the
+  state-manager had no STATE.md to append to → wrote nothing → persist pushed nothing. **Fixed in engine PR #2
+  (merged `fbf2ffc`):** added a "Restore pipeline state from factory-artifacts" step after checkout (mirror of
+  persist), and clarified the state-manager's CI role (agent WRITES the workspace `.factory/STATE.md`; the
+  workflow owns the branch round-trip). **Not yet re-validated by a live run** — next night-shift run should
+  show a `### international-cohort — …` entry appended to the instance Track build log + HEAD advancing.
+- **(c) ✅ (trivially)** instance Track build log un-clobbered — but only because (b) wrote nothing.
 
 ## Roadmap status (BUILD-PLAN §15)
 
@@ -76,9 +94,16 @@ stays OFF (it echoes tool results incl. secrets into the log).
 
 ## Open items (not blockers)
 
-- **build-track iteration cap (v0.9 refinement):** the adversary loop has no cap → runs away (50+ min, no
-  convergence) on a heavily-flawed draft, so it never commits. Add a max-N-passes cap → commit-what-it-has +
-  open a PR flagged "did not fully converge, M MUST-FIX remain."
+- ✅ **build-track iteration cap** — DONE (engine PR #1, `bee28fa`). See v1.0 list item 1.
+- **state-restore live re-validation:** engine PR #2 (`fbf2ffc`) fixed the asymmetric night-shift state loop
+  (restore-at-start added). NOT yet proven by a live instance run — the next `nightly-research` run should append
+  a Track build log entry to the instance `.factory/STATE.md` and advance `factory-artifacts` HEAD. Verify it.
+- **ingest.yml + weekly-maintenance.yml have NO state round-trip:** unlike nightly-research they have neither a
+  restore nor a persist step, so they never record `.factory/` state at all. Give them the same symmetric
+  restore+persist pair (follow-up to PR #2).
+- **cap value (6) is snug:** international-cohort converged at pass 5. A genuinely harder track needing 6–7 real
+  revise passes would get prematurely flagged "did not converge." Revisit `max_passes` if false-flags appear;
+  it's a per-market `factory.config` knob, so an instance can raise it.
 - **on-pr-review comment posting unverified:** reviewers run green but post 0 comments — likely because
   build-track already converged the PR to 0 MUST-FIX; verify by running on-pr-review against a deliberately-
   flawed PR.
@@ -90,6 +115,14 @@ stays OFF (it echoes tool results incl. secrets into the log).
 - 2026-05-31: engine repo made **public**; secret fragment scrubbed from history before publishing.
 - 2026-05-31: **researcher prefers MCP search** (Perplexity/Tavily), built-in WebSearch/WebFetch fallback.
 - 2026-05-31: **never cancel an in-flight paid run without asking** (operator rule).
+- 2026-06-01: **`max_passes` cap = 6** (default) on the adversary loop — the canonical home is
+  `factory.config` `convergence.max_passes`; lobsters mirror the default. Autonomous loops commit-flagged on
+  cap; human-gated loops surface-to-human.
+- 2026-06-01: **the workflow (not the state-manager agent) owns the `factory-artifacts` round-trip in CI** —
+  restore-at-start + persist-at-end are deterministic bash steps; the agent only writes the workspace
+  `.factory/STATE.md`. Avoids double-push and fragile haiku git surgery.
+- 2026-06-01: **also commit the cap fix to the engine on a feature branch → PR → squash-merge** (operator chose
+  push-and-merge over hold-local); CI `test` gate must be green before merge.
 
 ## How to resume (cold session, zero prior context)
 
