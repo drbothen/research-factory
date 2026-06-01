@@ -7,7 +7,8 @@ copy these and substitute placeholders; the `researcher`/`synthesizer` agents th
 
 ## The per-track document set
 
-Each track produces five documents; a market also has one L4 synthesis per release window.
+Each track produces five documents; a market also has one L4 synthesis per release window. The
+**L6 template is the lone cross-market doc** — it lives in the *portfolio* repo, not a market instance.
 
 | Template | Instance filename | Layer | Role |
 |---|---|---|---|
@@ -17,6 +18,7 @@ Each track produces five documents; a market also has one L4 synthesis per relea
 | `L3-findings-tldr.md` | `<market>-<track-slug>-findings-tldr.md` | L3 | compressed findings |
 | `track-summary.md` | `<market>-<track-slug>-summary.md` | L3→L4 | the complete L4-consumption index |
 | `L4-cross-track-synthesis.md` | `<market>-synthesis-<window>.md` | L4 | cross-track synthesis (per market) |
+| `L6-portfolio-synthesis.md` | `portfolio-<window>.md` (portfolio repo) | L6 | cross-market synthesis over each market's named L4/L5 — **always human-gated** |
 
 ## Placeholders to substitute
 
@@ -36,6 +38,8 @@ Each track produces five documents; a market also has one L4 synthesis per relea
   `Strong` / `Moderate` / `Weak` / `None`. A missing table is a MUST-FIX; an uncovered vector with no
   explanation is a SHOULD-FIX. The vector *set* is per-market config — the engine does not hardwire it.
 - **Observe-and-report only** (L2–L4): no ranking, recommendation, superlative, or "what to build."
+  The lone exception is **L6**, the cross-market layer, where labelled cross-market judgment may enter a
+  clearly-marked judgment section — and even there, never "what to build," and the doc is always human-gated.
 - **Cite-or-flag-or-drop:** every claim gets a citation, a `[Source needed: …]` / `[Access required: …]`
   flag (Type-1 real-but-unsourced), or deletion (Type-2 AI inference). Zero Type-2 content.
 

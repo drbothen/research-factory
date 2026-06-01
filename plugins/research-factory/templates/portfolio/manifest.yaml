@@ -1,0 +1,28 @@
+# portfolio/manifest.yaml — registry of the markets the L6 rollup synthesizes across.
+#
+# This is the portfolio repo's "seed": adding a market to the portfolio = appending an entry here,
+# never new code (P10). `/research-factory:init-market` step 7 appends a market automatically; you
+# can also add one by hand. The portfolio-rollup Action reads this file to pull each instance's
+# NAMED L4/L5 docs (cross-track synthesis + judgment) — index/summary level only. It NEVER pulls a
+# market's L3/L2/L1: reaching across the market boundary into a lower layer is a layer-discipline
+# violation and blows the token budget.
+#
+# Paths are repo-relative globs inside each instance. List only the CURRENT (latest-window) L4/L5
+# you want the rollup to observe — not the whole history — so the synthesis stays bounded.
+
+window: <current-rollup-window>          # label for this portfolio window/release (e.g. 2026-Q2)
+
+instances:
+  - slug: <market-a-slug>                # short market slug; becomes instance-outputs/<slug>/
+    repo: <org>/<market-a-slug>-research # owner/name of the private instance repo
+    l4:                                  # named L4 cross-track synthesis docs (latest window)
+      - corpus/**/l4-*.md
+    l5:                                  # named L5 judgment docs (latest window), if any
+      - corpus/**/l5-*.md
+
+  - slug: <market-b-slug>
+    repo: <org>/<market-b-slug>-research
+    l4:
+      - corpus/**/l4-*.md
+    l5:
+      - corpus/**/l5-*.md
