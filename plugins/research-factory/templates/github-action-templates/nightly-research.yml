@@ -25,6 +25,25 @@ jobs:
     timeout-minutes: 120     # bounded — one track/work-item, not the whole corpus (§12.2)
     steps:
       - uses: actions/checkout@v4
+
+      # Restore prior pipeline state (.factory/) from the orphan factory-artifacts branch BEFORE the
+      # builder runs, so the state-manager appends to the REAL track build log instead of starting
+      # from an empty workspace (§11). This is the mirror of "Persist pipeline state" at the end —
+      # without it the persist step finds an empty .factory/ and pushes nothing (the loop is a no-op).
+      # .factory/ is gitignored on main, so the extracted files are untracked working state.
+      - name: Restore pipeline state from factory-artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git fetch origin factory-artifacts 2>/dev/null || true
+          if git show-ref --verify --quiet refs/remotes/origin/factory-artifacts; then
+            mkdir -p .factory
+            git archive origin/factory-artifacts | tar -x -C .factory
+            echo "Restored .factory/ from factory-artifacts:"; ls -A .factory
+          else
+            echo "no factory-artifacts branch yet — first run; the state-manager will create .factory/STATE.md"
+          fi
+
       - name: Claude builder — run build-track on the next work-item
         id: claude
         uses: anthropics/claude-code-action@v1

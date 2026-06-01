@@ -33,10 +33,16 @@ Before any other action, say verbatim:
 
    **Pipeline state lives on the orphan `factory-artifacts` branch, NOT on `main` (§11).** `.factory/` is
    gitignored on `main` and mounted as a git worktree on `factory-artifacts`, so state history is separate
-   from the code/corpus history. Locally: `cd .factory && git add … && git commit && git push origin factory-artifacts`.
-   In a CI runner (fresh checkout, no worktree): fetch `factory-artifacts`, apply the `.factory/` changes onto it,
-   commit, and `git push origin factory-artifacts` — a **separate push** from the corpus PR branch. Never commit
-   `.factory/` onto `main` or onto a corpus PR branch.
+   from the code/corpus history. **Always WRITE the state into the workspace `.factory/STATE.md`** — append
+   this burst's entry to the `## Track build log` (and update phase/decisions). Then commit the branch:
+   - **Locally:** `cd .factory && git add … && git commit && git push origin factory-artifacts`.
+   - **In a CI runner (fresh checkout):** you only WRITE `.factory/STATE.md` in the workspace. The workflow
+     itself owns the factory-artifacts round-trip — a "Restore pipeline state" step seeds `.factory/` from
+     the branch *before* you run, and a "Persist pipeline state" step commits+pushes your `.factory/` changes
+     to `factory-artifacts` *after*. Do **not** fetch/commit/push `factory-artifacts` yourself in CI (that
+     double-handles the branch). If `.factory/STATE.md` is absent in CI, the restore step found no prior
+     state (first run) — **create it** so your entry is never silently dropped.
+   Never commit `.factory/` onto `main` or onto a corpus PR branch.
 3. **Single-Source-of-Truth.** Each metric (track count, vendor count, canonical dates) lives in exactly one authoritative file; everything else cites it. Never re-derive a canonical value.
 4. **Commit.** Stage the corpus changes and the state update together. Use the project commit-message convention. One burst, one commit.
 
