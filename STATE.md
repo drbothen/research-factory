@@ -11,7 +11,7 @@ input-hash: "[live-state]"
 traces_to: ""
 project: "research-factory"
 mode: "brownfield"
-current_step: "migration: hybrid-vsdd → full vsdd-factory plugin"
+current_step: "Phase 0 brownfield ingest COMPLETE — ready for Phase 1 spec crystallization"
 current_cycle: "v1.0-brownfield-migration"
 dtu_required: false
 ---
@@ -34,15 +34,15 @@ dtu_required: false
 | **Target Workspace** | plugins/research-factory/ |
 | **Started** | 2026-06-01 (vsdd onboarding) |
 | **Last Updated** | 2026-06-01 |
-| **Current Phase** | 0 |
-| **Current Step** | brownfield ingestion (not yet run) |
+| **Current Phase** | 0 → 1 (ingest complete) |
+| **Current Step** | Phase 0 complete; ready for Phase 1 |
 
 ## Phase Progress
 
 | Phase | Status | Started | Completed | Gate | Finding Progression |
 |-------|--------|---------|-----------|------|---------------------|
-| 0: Codebase Ingestion | in-progress | 2026-06-01 | | | |
-| 1: Spec Crystallization | not-started | | | | |
+| 0: Codebase Ingestion | passed | 2026-06-01 | 2026-06-01 | B.5+B.6 PASS | 6 passes → NITPICK |
+| 1: Spec Crystallization | ready | | | | |
 | 2: Story Decomposition | not-started | | | | |
 | 3: TDD Implementation | not-started | | | | |
 | 4: Holdout Evaluation | not-started | | | | |
@@ -56,8 +56,9 @@ dtu_required: false
 |------|-------|--------|--------|
 | Activate vsdd-factory | human | done | .claude/settings.local.json (agent=orchestrator, platform=darwin-arm64) |
 | Mount .factory + scaffold skeleton | state-manager | done | specs/ stories/ cycles/ … |
-| Migrate STATE → v2.0 schema | state-manager | in-progress | this file |
-| Brownfield ingest of existing engine | orchestrator | not-started | /vsdd-factory:brownfield-ingest |
+| Migrate STATE → v2.0 schema | state-manager | done | this file |
+| Brownfield ingest of existing engine | codebase-analyzer | done | semport/research-factory/ (15 files, ~4.2K ln) |
+| Phase C final synthesis + 16-item backlog | codebase-analyzer | done | research-factory-pass-8-deep-synthesis.md |
 
 ## Brownfield Subject — engine roadmap carried forward (pre-vsdd axis)
 
@@ -80,6 +81,7 @@ dtu_required: false
 | D-002 | Dogfood swap, not engine replacement | The research-factory engine stays the product; vsdd-factory is the build tool | 0 | 2026-06-01 | human |
 | D-003 | Migrate in place on factory-artifacts (no history rewrite) | Preserve the build trail; legacy STATE kept as a cycle file | 0 | 2026-06-01 | human |
 | D-004 | mode = brownfield | Engine is a mature existing codebase; vsdd ingests then carries items #4/#5 as features | 0 | 2026-06-01 | state-manager |
+| D-008 | Ran full brownfield-ingest (Phase A + B convergence + B.5/B.6 + C); analyzed engine in-place | Produce the vsdd semantic understanding + improvement backlog feeding Phase 1 | 0 | 2026-06-01 | orchestrator |
 | D-005 | max_passes cap = 6 (factory.config convergence.max_passes) | Adversary-loop runaway guard; instance-tunable | — | 2026-06-01 | human |
 | D-006 | Workflow (not state-manager agent) owns factory-artifacts round-trip in CI | Deterministic restore+persist; avoids double-push | — | 2026-06-01 | human |
 | D-007 | Engine repo public, MIT license | Public marketplace others clone from | — | 2026-06-01 | human |
@@ -102,7 +104,7 @@ dtu_required: false
 | Field | Value |
 |-------|-------|
 | **Date** | 2026-06-01 |
-| **Position** | Migration to full vsdd-factory complete through STATE v2.0; next = run /vsdd-factory:brownfield-ingest to produce vsdd specs from the existing engine, OR resolve B-001 to finish engine item #4 |
+| **Position** | Phase 0 brownfield ingest COMPLETE (6 passes→NITPICK, B.5/B.6 PASS). Synthesis + 16-item backlog (P0:3 P1:4 P2:4 P3:5) at semport/research-factory/research-factory-pass-8-deep-synthesis.md. Next = Phase 1 spec crystallization (/vsdd-factory:create-brief using the synthesis as input), OR resolve B-001 to finish engine item #4 |
 | **Convergence counter** | n/a (pre-adversarial) |
 
 ## Historical Content
@@ -110,5 +112,6 @@ dtu_required: false
 | Content | Location |
 |---------|----------|
 | Pre-migration hand-rolled STATE (222 lines: deployment fixes, open items, full decisions) | `cycles/v1.0-brownfield-migration/legacy-research-factory-state.md` |
+| Phase-0 brownfield ingest (15 analysis files, ~4.2K ln) + 16-item backlog | `semport/research-factory/` (synthesis = `…-pass-8-deep-synthesis.md`) |
 | Engine design + roadmap | `BUILD-PLAN.md` (on main) §15 / §15.1 |
 | Artifact trail | `git log` (main + factory-artifacts) |

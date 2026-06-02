@@ -19,4 +19,4 @@ repos:
       The research-factory engine: domain-agnostic GitHub-Actions-backed research
       pipeline shipping as a Claude Code plugin. Ingested to feed spec crystallization
       for continuing roadmap items #4 (L6 portfolio) and #5 (engine release).
-    status: ingesting
+    status: ingested
